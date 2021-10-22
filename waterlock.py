@@ -10,7 +10,7 @@ end_folder = 'E:/FOLDER-PATH-HERE'
 reserved_space = 1 # Enter value in Gibibytes
 '''========================================'''
 
-middle_folder = 'cargo' 
+middle_folder = 'cargo/' 
 retry_count = 0
 
 def get_hash(path):
@@ -38,14 +38,14 @@ def move_file(src, dst, stage):
             file_hash = get_hash(src)
             cur.execute("UPDATE data SET hash = ? WHERE path = ? AND hash = ''", (file_hash, src))
             con.commit()
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        os.makedirs(dst, exist_ok=True)
         copy2(src, dst_file)
         dst_hash = get_hash(dst_file)
         if file_hash == dst_hash:    
             if stage == "middle":
                 cur.execute('UPDATE data SET middle = 1 WHERE hash = ?', (file_hash,))
             elif stage == "end":
-                cur.execute('UPDATEd ata SET end = 1 WHERE hash = ?', (file_hash,))
+                cur.execute('UPDATE data SET end = 1 WHERE hash = ?', (file_hash,))
             con.commit()
             retry_count = 0
             return True
@@ -95,7 +95,7 @@ def determine_paths(src, dst):
 
 con, cur = connect_db()
 
-os.makedirs(os.path.dirname(middle_folder), exist_ok=True)
+os.makedirs(middle_folder, exist_ok=True)
 
 if os.path.exists(source_folder) and os.path.exists(middle_folder):
     print("Moving data to transfer-medium")
