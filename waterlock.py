@@ -68,7 +68,6 @@ class Waterlock():
                 path += [file]
                 path = [x for x in path if x is not '']
                 path = '/'.join(path)
-                print(path)
                 self.cur.execute('INSERT OR IGNORE INTO data VALUES (?,?,?,?)', (path, '', 0, 0))
         self.con.commit()
         return True
