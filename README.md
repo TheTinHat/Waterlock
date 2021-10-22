@@ -13,7 +13,7 @@ I use it to transfer large files that are too large to transfer over the network
 Change the settings at the top of the script. Store the script on the intermediary drive itself and run it from there. It will automatically create `waterlock.db` and a `cargo` folder where the data will be stored. Note that after the final transfer to the destination, Waterlock will *not* delete data on the intermediary drive. 
 
 
-It is named Waterlock after marine [locks](https://en.wikipedia.org/wiki/Lock_(water_navigation) used to move ships through waterways of different water levels in multiple stages. 
+It is named Waterlock after marine [locks](https://en.wikipedia.org/wiki/Lock_(water_navigation)) used to move ships through waterways of different water levels in multiple stages. 
 
 
 ## Note
