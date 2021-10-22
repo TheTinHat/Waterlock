@@ -1,6 +1,7 @@
 from hashlib import blake2b
 from shutil import copy2, disk_usage
 from time import process_time
+from winsound import Beep
 
 import os
 import sqlite3
@@ -229,6 +230,9 @@ if __name__ == "__main__":
                     )
 
     wl.start()
-
+    try:    
+        Beep(400,100)
+    except:
+        print('\a')
  
     

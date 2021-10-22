@@ -3,6 +3,7 @@ from shutil import rmtree
 from waterlock import Waterlock
 from itertools import product
 from random import random
+from winsound import Beep
 
 rmtree('test/')
 os.mkdir('test')
@@ -29,3 +30,7 @@ os.makedirs('test/dst')
 wl = Waterlock(source_directory='test/src/', middle_directory='test/cargo/', end_directory='test/dst/')
 wl.start()
 wl.verify_destination()
+try:    
+    Beep(400,100)
+except:
+    print('\a')
