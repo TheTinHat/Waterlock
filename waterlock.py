@@ -60,6 +60,9 @@ def move_file(src, dst, stage):
             retry_count += 1
             if retry_count < 10:
                 move_file(src, dst, stage)
+            else:
+                print('File hashes not matching after 10 attempts. Aborting...')
+                quit()
     else:
         print('Low disk space, aborting...')
         quit()
