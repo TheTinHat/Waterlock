@@ -32,7 +32,7 @@ class Waterlock():
 
     def sanitize(self, path):
         path = path.replace("\\","/").split('/')
-        path = [x for x in path if x is not '']
+        path = [x for x in path if x != '']
         path = '/'.join(path)
         return path
 
@@ -66,7 +66,7 @@ class Waterlock():
             for file in file_list:
                 path = folder.replace("\\","/").split('/')
                 path += [file]
-                path = [x for x in path if x is not '']
+                path = [x for x in path if x != '']
                 path = '/'.join(path)
                 self.cur.execute('INSERT OR IGNORE INTO data VALUES (?,?,?,?)', (path, '', 0, 0))
         self.con.commit()
