@@ -19,12 +19,13 @@ python waterlock.py
 If you are familiar with Python, you can also fully verify all the files on the middle or destination drives to ensure that the hashes match what is stored in the database. This is done using two additional class functions called `verify_middle()` and `verify_destination()`. The code to verify files on the destination would be as follows:
 
 ```
-wl = Waterlock( source_directory=source_directory, 
-                end_directory=end_direcotry, 
-                reserved_space=reserved_space
-                )
-wl.start()
-wl.verify_destination()
+if __name__ == "__main__":
+    wl = Waterlock( source_directory=source_directory, 
+                    end_directory=end_direcotry, 
+                    reserved_space=reserved_space
+                    )
+    wl.start()
+    wl.verify_destination()
 ```
 
 
