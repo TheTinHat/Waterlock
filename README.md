@@ -12,9 +12,24 @@ I use it to transfer large files that are too large to transfer over the network
 ## Usage
 Change the settings at the top of the script. Store the script on the intermediary drive itself and run it from there. It will automatically create `waterlock.db` and a `cargo` folder where the data will be stored. Note that after the final transfer to the destination, Waterlock will *not* delete data on the intermediary drive. 
 
+```
+python waterlock.py
+```
 
+If you are familiar with Python, you can also fully verify all the files on the middle or destination drives to ensure that the hashes match what is stored in the database. This is done using two additional class functions called `verify_middle()` and `verify_destination()`. The code to verify files on the destination would be as follows:
+
+```
+wl = Waterlock( source_directory=source_directory, 
+                end_directory=end_direcotry, 
+                reserved_space=reserved_space
+                )
+wl.start()
+wl.verify_destination()
+```
+
+
+## Notes
 It is named Waterlock after marine [locks](https://en.wikipedia.org/wiki/Lock_(water_navigation)) used to move ships through waterways of different water levels in multiple stages. 
 
 
-## Note
-I am not responsible for any lost data. This was an evening coding project. Use at your own discretion. 
+*I am not responsible for any lost data. This was an evening coding project. **Use at your own discretion.***
