@@ -21,15 +21,19 @@ class Waterlock():
                 middle_directory='cargo/',
                 end_directory='',
                 reserved_space=1):
-        self.source_directory = source_directory
-        self.middle_directory = middle_directory
-        self.end_directory = end_directory
+        self.source_directory = self.sanitize(source_directory)
+        self.middle_directory = self.sanitize(middle_directory)
+        self.end_directory = self.sanitize(end_directory)
         os.makedirs(self.middle_directory, exist_ok=True)
         self.reserved_space = reserved_space * 2**30
         self.con, self.cur = self.connect_db()
         self.retry_count = 0
 
-
+    def sanitize(self, path):
+        path = path.replace("\\","/").split('/')
+        path = [x for x in path if x is not '']
+        path = '/'.join(path)
+        return path
 
     def hash(self, file_path):
             file_hash = blake2b() 
@@ -40,6 +44,12 @@ class Waterlock():
                     fb = f.read(32768) 
             return str(file_hash.hexdigest())
     
+    def sizeof(self, num, suffix="B"):
+        for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
+            if abs(num) < 1024.0:
+                return f"{num:3.1f}{unit}{suffix}"
+            num /= 1024.0
+        return f"{num:.1f}Yi{suffix}"
 
     def connect_db(self):
         con = sqlite3.connect('waterlock.db')
@@ -53,9 +63,12 @@ class Waterlock():
     def refresh_src_files(self):
         for folder, _, file_list in os.walk(self.source_directory):
             for file in file_list:
-                folder = str(folder).replace("\\","/")
-                full_path = str(folder) + '/' + str(file)
-                self.cur.execute('INSERT OR IGNORE INTO data VALUES (?,?,?,?)', (full_path, '', 0, 0))
+                path = folder.replace("\\","/").split('/')
+                path += [file]
+                path = [x for x in path if x is not '']
+                path = '/'.join(path)
+                print(path)
+                self.cur.execute('INSERT OR IGNORE INTO data VALUES (?,?,?,?)', (path, '', 0, 0))
         self.con.commit()
         return True
 
@@ -74,6 +87,8 @@ class Waterlock():
             self.stage = "end"
             print(f"Moving data to {self.end_directory}")
         
+        elif os.path.exists(self.source_directory) is False:
+            raise Exception('Source directory not found')
         return self.stage
 
 
@@ -93,12 +108,14 @@ class Waterlock():
     def format_paths(self, src):
         if self.stage == "middle":
             dst = src.replace(self.source_directory, self.middle_directory)
-            return src, dst
 
         elif self.stage == "end":
             dst = src.replace(self.source_directory, self.end_directory)
             src = src.replace(self.source_directory, self.middle_directory)
-            return src, dst
+
+        dst = self.sanitize(dst)
+
+        return src, dst
 
 
     def move(self, src, dst):
@@ -174,7 +191,7 @@ class Waterlock():
         for file in self.file_list:
             self.free_space = self.check_space()
             src, dst = self.format_paths(file[0])
-            print(f'({file_count}/{files_left}):   {src}')
+            print(f'{file_count}/{files_left} ({self.sizeof(os.path.getsize(src))}):  {src}')
             self.move(src, dst)
             file_count += 1
         end = process_time() - start
@@ -190,7 +207,7 @@ class Waterlock():
             hash2 = self.hash(dst)
             if hash1 != hash2:
                 raise Exception(f'Error: destination file hash does not match for source file: {src}')
-        print('Success! Hashes of source and destination files match')
+        print('Success! Destination files match stored hashes of source files')
         return True
 
     def verify_middle(self):
@@ -202,11 +219,11 @@ class Waterlock():
             hash2 = self.hash(dst)
             if hash1 != hash2:
                 raise Exception(f'Error: destination file hash does not match for source file: {src}')
-        print('Success! Hashes of source and destination files match')
+        print('Success! Middle files match stored hashes of source files')
         return True
 
 if __name__ == "__main__":
-    wl = Waterlock( source_directory=source_directory, 
+    wl = Waterlock( source_directory=source_directory,
                     end_directory=end_directory, 
                     reserved_space=reserved_space
                     )
