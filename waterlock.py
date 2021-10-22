@@ -6,12 +6,11 @@ from hashlib import blake2b
 
 '''===== CHANGE THE FOLLOWING FOLDERS ====='''
 source_folder = 'C:/FOLDER-PATH-HERE'
-middle_folder = 'D:/FOLDER-PATH-HERE'
 end_folder = 'E:/FOLDER-PATH-HERE'
 reserved_space = 1 # Enter value in Gibibytes
 '''========================================'''
 
-
+middle_folder = 'cargo' 
 retry_count = 0
 
 def get_hash(path):
@@ -95,6 +94,9 @@ def determine_paths(src, dst):
 
 
 con, cur = connect_db()
+
+os.makedirs(os.path.dirname(middle_folder), exist_ok=True)
+
 if os.path.exists(source_folder) and os.path.exists(middle_folder):
     print("Moving data to transfer-medium")
     refresh_file_list(source_folder)
