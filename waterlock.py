@@ -5,8 +5,8 @@ from hashlib import blake2b
 
 
 '''===== CHANGE THE FOLLOWING FOLDERS ====='''
-source_folder = 'C:/FOLDER-PATH-HERE'
-end_folder = 'E:/FOLDER-PATH-HERE'
+source_folder = '/PATH/TO/FILE'
+end_folder = '/PATH/TO/FILE'
 reserved_space = 1 # Enter value in Gibibytes
 '''========================================'''
 
@@ -25,14 +25,20 @@ def get_hash(path):
 def move_file(src, dst, stage):
     global retry_count
     global reserved_space
+    global source_folder
+    global middle_folder
+    global end_folder
     con, cur = connect_db()
     file_size = os.path.getsize(src)
-    free_space = disk_usage('C:/')[2]
+    if stage == "middle":
+        free_space = disk_usage(middle_folder)[2]
+    elif stage == "end":
+        free_space = disk_usage(end_folder)[2]
     dst_file = dst + src.split('/')[-1]
     if check_size(src, dst_file) == 2:
         os.remove(dst_file)
     if file_size < (free_space - (reserved_space*2**30)):
-        cur.execute("SELECT hash FROM data WHERE path = ?", (src,))
+        cur.execute("SELECT hash FROM data WHERE path = ?", (src.replace(middle_folder, source_folder),))
         file_hash = cur.fetchone()[0]
         if file_hash == '':
             file_hash = get_hash(src)
@@ -71,7 +77,7 @@ def connect_db():
     con = sqlite3.connect('waterlock.db')
     cur = con.cursor()
     cur.execute('CREATE TABLE IF NOT EXISTS data \
-        (folder TEXT, file TEXT, path TEXT UNIQUE, hash TEXT, middle INTEGER, end INTEGER)')
+        (path TEXT UNIQUE, hash TEXT, middle INTEGER, end INTEGER)')
     con.commit()
     return con, cur
 
@@ -80,17 +86,10 @@ def refresh_file_list(source_folder):
     for folder, _, file_list in os.walk(source_folder):
         for file in file_list:
             full_path = str(folder) + '/' + str(file)
-            cur.execute('INSERT OR IGNORE INTO data VALUES (?,?,?,?,?,?)', \
-                (str(folder), str(file), full_path, '', 0, 0))
+            cur.execute('INSERT OR IGNORE INTO data VALUES (?,?,?,?)', \
+                (full_path, '', 0, 0))
     con.commit()
     con.close()
-
-def determine_paths(src, dst):
-    src = file[0]
-    suffix = src.split('/')[-2]
-    dst = dst + suffix + '/'
-    return src, dst
-
 
 
 con, cur = connect_db()
@@ -106,7 +105,9 @@ if os.path.exists(source_folder) and os.path.exists(middle_folder):
     file_count = 1
     print(f'There are {files_left} files to transfer. Starting up...')
     for file in unmoved_files:
-        src, dst = determine_paths(file, middle_folder)
+        src = file[0]
+        suffix = src.split('/')[-2]
+        dst = middle_folder + suffix + '/'
         print(f'({file_count}/{files_left}):   {src}')
         move_file(src, dst, 'middle')
         file_count += 1
@@ -118,9 +119,10 @@ elif os.path.exists(middle_folder) and os.path.exists(end_folder):
     file_count = 1
     print(f'There are {files_left} files to transfer. Starting up...')
     for file in unmoved_files:
-        src, dst = determine_paths(file, end_folder)
+        src = file[0]
+        suffix = src.split('/')[-2]
+        src = src.replace(source_folder, middle_folder)
+        dst = end_folder + suffix + '/'
         print(f'({file_count}/{files_left}):   {src}')
         move_file(src, dst, 'end')
         file_count += 1
-
-
