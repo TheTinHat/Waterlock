@@ -1,7 +1,7 @@
 import os
 from shutil import rmtree
 from numpy import source
-from waterlock2 import Waterlock
+from waterlock import Waterlock
 from itertools import product
 from random import random
 

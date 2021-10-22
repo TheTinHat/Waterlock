@@ -6,13 +6,15 @@ from time import process_time
 import os
 import sqlite3
 
+
 '''===== IF RUNNING AS SCRIPT CHANGE THE FOLLOWING FOLDERS ====='''
 
 source_directory = '/PATH/TO/FOLDER/'
-end_direcotry = '/PATH/TO/FOLDER/'
+end_directory = '/PATH/TO/FOLDER/'
 reserved_space = 1 # Enter value in Gibibytes
 
 '''============================================================='''
+
 
 class Waterlock():
     def __init__(self,
@@ -206,7 +208,11 @@ class Waterlock():
 
 if __name__ == "__main__":
     wl = Waterlock( source_directory=source_directory, 
-                    end_directory=end_direcotry, 
+                    end_directory=end_directory, 
                     reserved_space=reserved_space
                     )
+
     wl.start()
+
+ 
+    
