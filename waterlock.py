@@ -1,5 +1,4 @@
 from hashlib import blake2b
-from pathlib import PurePosixPath
 from shutil import copy2, disk_usage
 from time import process_time
 
@@ -9,8 +8,8 @@ import sqlite3
 
 '''===== IF RUNNING AS SCRIPT CHANGE THE FOLLOWING FOLDERS ====='''
 
-source_directory = '/PATH/TO/FOLDER/'
-end_directory = '/PATH/TO/FOLDER/'
+source_directory = '/ABSOLUTE/PATH/TO/FOLDER/'
+end_directory = '/ABSOLUTE/PATH/TO/FOLDER/'
 reserved_space = 1 # Enter value in Gibibytes
 
 '''============================================================='''
