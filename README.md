@@ -8,7 +8,7 @@ The use-case Waterlock was designed for is moving files from one computer (i.e. 
 - It will fill the intermediary drive with as many files as it can, aside from a user-configurable amount of reserve-space. 
 - It performs blake2 checksums with every file copy, comparing it to the initial hash value stored in the SQLite database to ensure that data is not corrupted. 
 - It uses a SQLite database to track what data has been moved. As a result, you can incrementally move data from one location to another with minimal user input. 
-- Every time Waterlock is run on the source location, it will check for any files that have been recently modified (based on timestamp, not hash). Any modified files will have their hash & modification timestamps updated in the database, in addition to being marked as unmoved such that they are transferred again and updated. 
+- Every time Waterlock is run on the source location, it will check for any files that have been recently modified (based on timestamp, not hash). Any modified files will have their hash & modification timestamps updated in the database, in addition to being marked as unmoved such that they are transferred again and updated. Note that Waterlock does *not* version files. Nevertheless, silently corrupted files should theoretically not be transferred over unless their modification timestamp has been adjusted.
 - Every time Waterlock is run on the source location, it will check for any files that were previously moved to the intermediary drive but did not reach the destination. If these files are no longer on the intermediary drive due to accidental deletion for instance, Waterlock will move those files to the intermediary drive again.
 
 
