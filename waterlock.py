@@ -24,11 +24,18 @@ class Waterlock():
         self.source_directory = self.sanitize(source_directory)
         self.middle_directory = self.sanitize(middle_directory)
         self.end_directory = self.sanitize(end_directory)
+        self.check_config()
         os.makedirs(self.middle_directory, exist_ok=True)
         self.reserved_space = reserved_space * 2**30
         self.con, self.cur = self.connect_db()
         self.retry_count = 0
 
+    def check_config(self):
+        if 'ABSOLUTE/PATH/TO/FOLDER' in self.source_directory \
+            or 'ABSOLUTE/PATH/TO/FOLDER' in self.end_directory:
+            raise Exception("Error: change the configuration at the top fo the script first!")
+        if os.path.isabs(self.source_directory) is False or os.path.isabs(self.end_directory) is False:
+            raise Exception('Error: relative path detected. Waterlock only accepts absolute file paths!')
 
     def connect_db(self):
         con = sqlite3.connect('waterlock.db')
