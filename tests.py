@@ -3,14 +3,14 @@ from shutil import rmtree
 from waterlock import Waterlock
 from itertools import product
 from random import random
-from winsound import Beep
+
 
 rmtree('test/')
 os.mkdir('test')
 if os.path.exists('waterlock.db'):
     os.remove('waterlock.db')
 
-x = product([i for i in range(5)], repeat=3)
+x = product([i for i in range(2)], repeat=3)
 for y in x:
     os.makedirs(f'test/src/{y[0]}/{y[1]}', exist_ok=True)
     with open(f'test/src/{y[0]}/{y[1]}/{y[2]}.random', 'wb') as fout:
@@ -19,9 +19,12 @@ for y in x:
 
 wl = Waterlock(source_directory='test/src/', middle_directory='test/cargo/', end_directory='test/dst/')
 wl.start()
+
+rmtree('test/cargo/0')
+wl.reset()
+wl.start()
 wl.verify_middle()
 del wl
-
 
 rmtree('test/src')
 os.makedirs('test/dst')
@@ -30,7 +33,4 @@ os.makedirs('test/dst')
 wl = Waterlock(source_directory='test/src/', middle_directory='test/cargo/', end_directory='test/dst/')
 wl.start()
 wl.verify_destination()
-try:    
-    Beep(400,100)
-except:
-    print('\a')
+

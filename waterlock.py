@@ -1,7 +1,6 @@
 from hashlib import blake2b
 from shutil import copy2, disk_usage
 from time import process_time
-from winsound import Beep
 
 import os
 import sqlite3
@@ -36,6 +35,7 @@ class Waterlock():
         path = '/'.join(path)
         return path
 
+
     def hash(self, file_path):
             file_hash = blake2b() 
             with open(file_path, 'rb') as f:
@@ -45,12 +45,14 @@ class Waterlock():
                     fb = f.read(32768) 
             return str(file_hash.hexdigest())
     
+
     def sizeof(self, num, suffix="B"):
         for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
             if abs(num) < 1024.0:
                 return f"{num:3.1f}{unit}{suffix}"
             num /= 1024.0
         return f"{num:.1f}Yi{suffix}"
+
 
     def connect_db(self):
         con = sqlite3.connect('waterlock.db')
@@ -81,6 +83,7 @@ class Waterlock():
 
         elif os.path.exists(self.source_directory) and os.path.exists(self.middle_directory):
             self.stage = "middle"
+            self.reset()
             print(f"Moving data to {self.middle_directory}")
 
         elif os.path.exists(self.middle_directory) and os.path.exists(self.end_directory):
@@ -132,9 +135,10 @@ class Waterlock():
         file_hash = self.find_hash(src)
 
         os.makedirs(dst_dir, exist_ok=True)
-        copy2(src,dst)
-        verified = self.verify_move(dst, file_hash)
 
+        copy2(src,dst)
+
+        verified = self.verify_move(dst, file_hash)
         if verified == False:
             os.remove(dst)
             self.retry_count += 1
@@ -176,11 +180,13 @@ class Waterlock():
             self.con.commit()
         return file_hash
         
+
     def check_space(self):
         if self.stage == "middle":
             return disk_usage(self.middle_directory)[2]
         if self.stage == "end":
             return disk_usage(self.end_directory)[2]
+
 
     def start(self):
         self.stage = self.detect_stage()
@@ -198,6 +204,7 @@ class Waterlock():
         print(f"Complete! Finished in {end} seconds")
         return True
 
+
     def verify_destination(self):
         print("Beginning full file verification of destination")
         self.cur.execute('SELECT path, hash FROM data WHERE middle = 1 and end = 1')
@@ -209,6 +216,7 @@ class Waterlock():
                 raise Exception(f'Error: destination file hash does not match for source file: {src}')
         print('Success! Destination files match stored hashes of source files')
         return True
+
 
     def verify_middle(self):
         print("Beginning full file verification of middle")
@@ -222,6 +230,21 @@ class Waterlock():
         print('Success! Middle files match stored hashes of source files')
         return True
 
+
+    def reset(self):
+        self.cur.execute('SELECT path FROM data WHERE middle = 1 and end = 0')
+        pending_paths = self.cur.fetchall()
+        for file_path in pending_paths:
+            file_path = file_path[0]
+            mid_path = file_path.replace(self.source_directory, self.middle_directory)
+            mid_path = self.sanitize(mid_path)
+            if os.path.exists(mid_path) is False:
+                self.cur.execute('UPDATE data SET middle = 0 and end = 0 WHERE path = ?', (file_path,))
+                self.con.commit() 
+                print(f'{file_path} is missing from middle location, marking as unmoved in database')
+        return True
+
+
 if __name__ == "__main__":
     wl = Waterlock( source_directory=source_directory,
                     end_directory=end_directory, 
@@ -229,9 +252,6 @@ if __name__ == "__main__":
                     )
 
     wl.start()
-    try:    
-        Beep(400,100)
-    except:
-        print('\a')
+
  
     
