@@ -8,8 +8,8 @@ import sqlite3
 
 '''===== IF RUNNING AS SCRIPT CHANGE THE FOLLOWING FOLDERS ====='''
 
-source_directory = '/ABSOLUTE/PATH/TO/FOLDER/'
-end_directory = '/ABSOLUTE/PATH/TO/FOLDER/'
+source_directory = '/ABSOLUTE/PATH/TO/FOLDER/' # Absolute File Path Only!
+end_directory = '/ABSOLUTE/PATH/TO/FOLDER/' # Absolute File Path Only!
 reserved_space = 1 # Enter value in Gibibytes
 
 '''============================================================='''
@@ -29,6 +29,16 @@ class Waterlock():
         self.con, self.cur = self.connect_db()
         self.retry_count = 0
 
+
+    def connect_db(self):
+        con = sqlite3.connect('waterlock.db')
+        cur = con.cursor()
+        cur.execute('CREATE TABLE IF NOT EXISTS data \
+            (path TEXT UNIQUE, last_modified INT, hash TEXT, middle INTEGER, end INTEGER)')
+        con.commit()
+        return con, cur
+
+
     def sanitize(self, path):
         path = path.replace("\\","/").split('/')
         path = [x for x in path if x != '']
@@ -46,6 +56,22 @@ class Waterlock():
             return str(file_hash.hexdigest())
     
 
+    def find_hash(self, src):
+        if self.stage == "middle":
+            path = src
+        elif self.stage == "end":
+            path = src.replace(self.middle_directory, self.source_directory)
+        
+        self.cur.execute("SELECT hash FROM data WHERE path = ?", (path,))
+        file_hash = self.cur.fetchone()[0]
+        
+        if file_hash == '':
+            file_hash = self.hash(src)
+            self.cur.execute("UPDATE data SET hash = ? WHERE path = ? AND hash = ''", (file_hash, src))
+            self.con.commit()
+        return file_hash
+
+
     def sizeof(self, num, suffix="B"):
         for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
             if abs(num) < 1024.0:
@@ -54,26 +80,11 @@ class Waterlock():
         return f"{num:.1f}Yi{suffix}"
 
 
-    def connect_db(self):
-        con = sqlite3.connect('waterlock.db')
-        cur = con.cursor()
-        cur.execute('CREATE TABLE IF NOT EXISTS data \
-            (path TEXT UNIQUE, last_modified INT, hash TEXT, middle INTEGER, end INTEGER)')
-        con.commit()
-        return con, cur
-
-
-    def refresh_src_files(self):
-        for folder, _, file_list in os.walk(self.source_directory):
-            for file in file_list:
-                path = folder.replace("\\","/").split('/')
-                path += [file]
-                path = [x for x in path if x != '']
-                path = '/'.join(path)
-                modify_time = os.path.getmtime(path)
-                self.cur.execute('INSERT OR IGNORE INTO data VALUES (?,?,?,?,?)', (path, modify_time, '', 0, 0))
-        self.con.commit()
-        return True
+    def check_space(self):
+        if self.stage == "middle":
+            return disk_usage(self.middle_directory)[2]
+        if self.stage == "end":
+            return disk_usage(self.end_directory)[2]
 
 
     def detect_stage(self):
@@ -95,6 +106,19 @@ class Waterlock():
         elif os.path.exists(self.source_directory) is False:
             raise Exception('Source directory not found')
         return self.stage
+
+
+    def refresh_src_files(self):
+        for folder, _, file_list in os.walk(self.source_directory):
+            for file in file_list:
+                path = folder.replace("\\","/").split('/')
+                path += [file]
+                path = [x for x in path if x != '']
+                path = '/'.join(path)
+                modify_time = os.path.getmtime(path)
+                self.cur.execute('INSERT OR IGNORE INTO data VALUES (?,?,?,?,?)', (path, modify_time, '', 0, 0))
+        self.con.commit()
+        return True
 
 
     def get_file_list(self):
@@ -153,43 +177,6 @@ class Waterlock():
             return True
 
 
-    def verify_move(self, file_path, hash1):
-        hash2 = self.hash(file_path)
-        if hash1 == hash2:    
-            if self.stage == "middle":
-                self.cur.execute('UPDATE data SET middle = 1 WHERE hash = ?', (hash1,))
-            elif self.stage == "end":
-                self.cur.execute('UPDATE data SET end = 1 WHERE hash = ?', (hash1,))
-            self.con.commit()
-            self.retry_count = 0
-            return True
-        else:
-            return False
-
-
-    def find_hash(self, src):
-        if self.stage == "middle":
-            path = src
-        elif self.stage == "end":
-            path = src.replace(self.middle_directory, self.source_directory)
-        
-        self.cur.execute("SELECT hash FROM data WHERE path = ?", (path,))
-        file_hash = self.cur.fetchone()[0]
-        
-        if file_hash == '':
-            file_hash = self.hash(src)
-            self.cur.execute("UPDATE data SET hash = ? WHERE path = ? AND hash = ''", (file_hash, src))
-            self.con.commit()
-        return file_hash
-        
-
-    def check_space(self):
-        if self.stage == "middle":
-            return disk_usage(self.middle_directory)[2]
-        if self.stage == "end":
-            return disk_usage(self.end_directory)[2]
-
-
     def start(self):
         self.stage = self.detect_stage()
         self.get_file_list()
@@ -207,17 +194,18 @@ class Waterlock():
         return True
 
 
-    def verify_destination(self):
-        print("Beginning full file verification of destination")
-        self.cur.execute('SELECT path, hash FROM data WHERE middle = 1 and end = 1')
-        files_to_verify = self.cur.fetchall()
-        for src, hash1 in files_to_verify:
-            src, dst = self.format_paths(src)
-            hash2 = self.hash(dst)
-            if hash1 != hash2:
-                raise Exception(f'Error: destination file hash does not match for source file: {src}')
-        print('Success! Destination files match stored hashes of source files')
-        return True
+    def verify_move(self, file_path, hash1):
+        hash2 = self.hash(file_path)
+        if hash1 == hash2:    
+            if self.stage == "middle":
+                self.cur.execute('UPDATE data SET middle = 1 WHERE hash = ?', (hash1,))
+            elif self.stage == "end":
+                self.cur.execute('UPDATE data SET end = 1 WHERE hash = ?', (hash1,))
+            self.con.commit()
+            self.retry_count = 0
+            return True
+        else:
+            return False
 
 
     def verify_middle(self):
@@ -230,6 +218,19 @@ class Waterlock():
             if hash1 != hash2:
                 raise Exception(f'Error: destination file hash does not match for source file: {src}')
         print('Success! Middle files match stored hashes of source files')
+        return True
+
+
+    def verify_destination(self):
+        print("Beginning full file verification of destination")
+        self.cur.execute('SELECT path, hash FROM data WHERE middle = 1 and end = 1')
+        files_to_verify = self.cur.fetchall()
+        for src, hash1 in files_to_verify:
+            src, dst = self.format_paths(src)
+            hash2 = self.hash(dst)
+            if hash1 != hash2:
+                raise Exception(f'Error: destination file hash does not match for source file: {src}')
+        print('Success! Destination files match stored hashes of source files')
         return True
 
 
@@ -268,5 +269,6 @@ if __name__ == "__main__":
 
     wl.start()
 
- 
+#   wl.verify_middle()
+#   wl.verify_destination()
     

@@ -2,6 +2,8 @@
 
 Waterlock is a Python script meant for incrementally transferring data between three folder locations in two separate stages. It performs hash verification and persistently tracks data transfer progress using SQLite.
 
+*I am not responsible for any lost data. This was an evening coding project. **Use at your own discretion.***
+
 
 ## Use Case & Features
 The use-case Waterlock was designed for is moving files from one computer (i.e. your home server) to a intermediary drive (i.e. a portable hard drive), and then from the hard drive to another computer (i.e. an offsite backup server). 
@@ -36,8 +38,6 @@ if __name__ == "__main__":
 
 
 
-## Notes
+## Why 'Waterlock'?
 It is named Waterlock after marine [locks](https://en.wikipedia.org/wiki/Lock_(water_navigation)) used to move ships through waterways of different water levels in multiple stages. 
 
-
-*I am not responsible for any lost data. This was an evening coding project. **Use at your own discretion.***
