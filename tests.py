@@ -38,4 +38,3 @@ os.makedirs('test/dst')
 wl = Waterlock(source_directory='test/src/', middle_directory='test/cargo/', end_directory='test/dst/')
 wl.start()
 wl.verify_destination()
-
