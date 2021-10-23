@@ -1,5 +1,5 @@
 from hashlib import blake2b
-from shutil import copy2, disk_usage
+from shutil import copy2, disk_usage, rmtree
 from time import process_time
 
 import os
@@ -190,6 +190,7 @@ class Waterlock():
             self.move(src, dst)
             file_count += 1
         end = process_time() - start
+        self.success = True
         print(f"Complete! Finished in {end} seconds")
         return True
 
@@ -260,6 +261,18 @@ class Waterlock():
                 print(f'{file} was modified since last transfer, marking as unmoved in database') 
         return True
 
+    def dump_cargo(self):
+        if self.stage == "end" and self.success == True:
+            dump = input('Do you want to dump cargo? [Yes, No]: ')
+            if dump == 'Yes':
+                if self.middle_directory != 'cargo':
+                    raise Exception('dump_cargo does not support non-default cargo (middle file) locations')
+                elif self.middle_directory == "cargo":
+                    rmtree('cargo/')
+                    os.mkdir('cargo')
+            else:
+                print("Exiting...") 
+                
 
 if __name__ == "__main__":
     wl = Waterlock( source_directory=source_directory,
@@ -269,6 +282,7 @@ if __name__ == "__main__":
 
     wl.start()
 
+#   wl.dump_cargo()
 #   wl.verify_middle()
 #   wl.verify_destination()
     
