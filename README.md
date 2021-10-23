@@ -15,7 +15,6 @@ The use-case Waterlock was designed for is moving files from one computer (i.e. 
 
 ## Usage
 Change the settings at the top of the script, using *absolute file paths*. While relative paths may work, they are more error prone due to string formatting issues. Store the script on the intermediary drive itself and run it from there. It will automatically create `waterlock.db` and a `cargo` folder where the data will be stored. Note that after the final transfer to the destination, Waterlock will *not* delete data on the intermediary drive. 
-Change the settings at the top of the script. Store the script on the intermediary drive itself and run it from there. It will automatically create `waterlock.db` and a `cargo` folder where the data will be stored. Note that after the final transfer to the destination, Waterlock will *not* delete data on the intermediary drive. 
 
 ```
 python waterlock.py
