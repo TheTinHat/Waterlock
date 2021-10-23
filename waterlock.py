@@ -155,7 +155,7 @@ class Waterlock():
 
         file_size = os.path.getsize(src)
         if file_size > (self.free_space - self.reserved_space):
-            print(f'Only {int(self.free_space/2**30)} Gib left, stopping...')
+            print(f'Only {int(self.free_space/2**30)} GiB left, stopping...')
             quit()
         
         file_hash = self.find_hash(src)
