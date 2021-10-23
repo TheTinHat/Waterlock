@@ -58,7 +58,7 @@ class Waterlock():
         con = sqlite3.connect('waterlock.db')
         cur = con.cursor()
         cur.execute('CREATE TABLE IF NOT EXISTS data \
-            (path TEXT UNIQUE, hash TEXT, middle INTEGER, end INTEGER)')
+            (path TEXT UNIQUE, last_modified INT, hash TEXT, middle INTEGER, end INTEGER)')
         con.commit()
         return con, cur
 
@@ -70,7 +70,8 @@ class Waterlock():
                 path += [file]
                 path = [x for x in path if x != '']
                 path = '/'.join(path)
-                self.cur.execute('INSERT OR IGNORE INTO data VALUES (?,?,?,?)', (path, '', 0, 0))
+                modify_time = os.path.getmtime(path)
+                self.cur.execute('INSERT OR IGNORE INTO data VALUES (?,?,?,?,?)', (path, modify_time, '', 0, 0))
         self.con.commit()
         return True
 
@@ -84,6 +85,7 @@ class Waterlock():
         elif os.path.exists(self.source_directory) and os.path.exists(self.middle_directory):
             self.stage = "middle"
             self.reset()
+            self.check_modify()
             print(f"Moving data to {self.middle_directory}")
 
         elif os.path.exists(self.middle_directory) and os.path.exists(self.end_directory):
@@ -239,9 +241,22 @@ class Waterlock():
             mid_path = file_path.replace(self.source_directory, self.middle_directory)
             mid_path = self.sanitize(mid_path)
             if os.path.exists(mid_path) is False:
-                self.cur.execute('UPDATE data SET middle = 0 and end = 0 WHERE path = ?', (file_path,))
+                self.cur.execute('UPDATE data SET middle = 0, end = 0 WHERE path = ?', (file_path,))
                 self.con.commit() 
                 print(f'{file_path} is missing from middle location, marking as unmoved in database')
+        return True
+
+
+    def check_modify(self):
+        self.cur.execute('SELECT path, last_modified FROM data')
+        files = self.cur.fetchall()
+        for file, last_modified in files:
+            modify_time = os.path.getmtime(file)
+            if modify_time > last_modified:
+                hash = self.hash(file)
+                self.cur.execute('UPDATE data SET last_modified = ?, \
+                middle = 0, end = 0, hash = ? WHERE path = ?', (modify_time, hash, file))
+                print(f'{file} was modified since last transfer, marking as unmoved in database') 
         return True
 
 

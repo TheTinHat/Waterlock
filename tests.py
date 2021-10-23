@@ -23,6 +23,11 @@ wl.start()
 rmtree('test/cargo/0')
 wl.reset()
 wl.start()
+
+with open(f'test/src/0/0/0.random', 'wb') as fout:
+        fout.write(os.urandom(int(10240 * random())))
+wl.check_modify()
+wl.start()
 wl.verify_middle()
 del wl
 
