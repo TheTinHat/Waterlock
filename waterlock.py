@@ -178,6 +178,7 @@ class Waterlock():
 
 
     def start(self):
+        print("Starting up Waterlock, preparing to transfer...")
         self.stage = self.detect_stage()
         self.get_file_list()
         files_left = len(self.file_list)
@@ -271,7 +272,7 @@ class Waterlock():
                     rmtree('cargo/')
                     os.mkdir('cargo')
             else:
-                print("Exiting...") 
+                input('Press ENTER to exit')
                 
 
 if __name__ == "__main__":
