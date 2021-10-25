@@ -23,8 +23,8 @@ class Waterlock():
                 reserved_space=1):
         self.source_directory = self.sanitize(source_directory)
         self.end_directory = self.sanitize(end_directory)
-        self.make_name()
         self.check_config()
+        self.make_name()
         self.reserved_space = reserved_space * 2**30
         self.con, self.cur = self.connect_db()
         self.retry_count = 0
@@ -50,6 +50,8 @@ class Waterlock():
         self.middle_directory = 'cargo/' + str(x)
         if os.path.exists(self.middle_directory) is False:
             os.makedirs(self.middle_directory)
+        if os.path.exists('config/') is False:
+            os.mkdir('config/')
         self.db_name = 'config/' + str(x) + '.db'
         print(self.middle_directory)
         print(self.db_name)
@@ -281,7 +283,7 @@ class Waterlock():
         if self.stage == "end" and self.success == True:
             dump = input('Do you want to dump cargo? [Yes, No]: ')
             if dump == 'Yes':
-                    rmtree('cargo/*')
+                    rmtree(self.middle_directory)
                     os.mkdir(self.middle_directory)
             else:
                 input('Press ENTER to exit')
