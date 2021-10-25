@@ -7,9 +7,10 @@ import sqlite3
 
 
 '''===== IF RUNNING AS SCRIPT CHANGE THE FOLLOWING FOLDERS ====='''
-
-source_directory = '/ABSOLUTE/PATH/TO/FOLDER/' # Absolute File Path Only!
-end_directory = '/ABSOLUTE/PATH/TO/FOLDER/' # Absolute File Path Only!
+# Absolute File Paths Only! Add comma-separated paths (e.g. a list of strings) to support multiple source directories
+# If using multiple source and end directories, ensure they are in the same order! See example in comment below.
+source_directory = ['/ABSOLUTE/PATH/TO/FOLDER/'] #['/ABSOLUTE/PATH/ONE', '/ABSOLUTE/PATH/TWO']
+end_directory = ['/ABSOLUTE/PATH/TO/FOLDER/'] #['/ABSOLUTE/PATH/ONE', '/ABSOLUTE/PATH/TWO']
 reserved_space = 1 # Enter value in Gibibytes
 
 '''============================================================='''
@@ -18,14 +19,12 @@ reserved_space = 1 # Enter value in Gibibytes
 class Waterlock():
     def __init__(self,
                 source_directory='',
-                middle_directory='cargo/',
                 end_directory='',
                 reserved_space=1):
         self.source_directory = self.sanitize(source_directory)
-        self.middle_directory = self.sanitize(middle_directory)
         self.end_directory = self.sanitize(end_directory)
+        self.make_name()
         self.check_config()
-        os.makedirs(self.middle_directory, exist_ok=True)
         self.reserved_space = reserved_space * 2**30
         self.con, self.cur = self.connect_db()
         self.retry_count = 0
@@ -38,12 +37,22 @@ class Waterlock():
             raise Exception('Error: relative path detected. Waterlock only accepts absolute file paths!')
 
     def connect_db(self):
-        con = sqlite3.connect('waterlock.db')
+        con = sqlite3.connect(self.db_name)
         cur = con.cursor()
         cur.execute('CREATE TABLE IF NOT EXISTS data \
             (path TEXT UNIQUE, last_modified INT, hash TEXT, middle INTEGER, end INTEGER)')
         con.commit()
         return con, cur
+
+
+    def make_name(self):
+        x = self.source_directory.split('/')[-1]
+        self.middle_directory = 'cargo/' + str(x)
+        if os.path.exists(self.middle_directory) is False:
+            os.makedirs(self.middle_directory)
+        self.db_name = 'config/' + str(x) + '.db'
+        print(self.middle_directory)
+        print(self.db_name)
 
 
     def sanitize(self, path):
@@ -68,7 +77,6 @@ class Waterlock():
             path = src
         elif self.stage == "end":
             path = src.replace(self.middle_directory, self.source_directory)
-        
         self.cur.execute("SELECT hash FROM data WHERE path = ?", (path,))
         file_hash = self.cur.fetchone()[0]
         
@@ -273,30 +281,27 @@ class Waterlock():
         if self.stage == "end" and self.success == True:
             dump = input('Do you want to dump cargo? [Yes, No]: ')
             if dump == 'Yes':
-                if self.middle_directory != 'cargo':
-                    confirm = input('Warning: dumping cargo from custom middle folders can be dangerous if misconfigured. Proceed? [Yes, No]: ')
-                    if confirm == "Yes":
-                        rmtree(self.middle_directory)
-                        os.mkdir(self.middle_directory)
-                elif self.middle_directory == "cargo":
-                    rmtree('cargo/')
-                    os.mkdir('cargo')
+                    rmtree('cargo/*')
+                    os.mkdir(self.middle_directory)
             else:
                 input('Press ENTER to exit')
                 
 
 if __name__ == "__main__":
 
+    if len(source_directory) != len(end_directory):
+        raise Exception("Error: different number of source and end directories.")
 
+    for i in range(len(source_directory)):
+        wl = Waterlock( source_directory=source_directory[i],
+                        end_directory=end_directory[i], 
+                        reserved_space=reserved_space
+                        )
+        wl.start()
+        
+    #   wl.dump_cargo()
+    #   wl.verify_middle()
+    #   wl.verify_destination()
 
-    wl = Waterlock( source_directory=source_directory,
-                    end_directory=end_directory, 
-                    reserved_space=reserved_space
-                    )
-
-    wl.start()
-
-#   wl.dump_cargo()
-#   wl.verify_middle()
-#   wl.verify_destination()
+        del wl
     
