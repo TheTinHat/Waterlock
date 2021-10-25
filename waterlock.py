@@ -274,7 +274,10 @@ class Waterlock():
             dump = input('Do you want to dump cargo? [Yes, No]: ')
             if dump == 'Yes':
                 if self.middle_directory != 'cargo':
-                    raise Exception('dump_cargo does not support non-default cargo (middle file) locations')
+                    confirm = input('Warning: dumping cargo from custom middle folders can be dangerous if misconfigured. Proceed? [Yes, No]: ')
+                    if confirm == "Yes":
+                        rmtree(self.middle_directory)
+                        os.mkdir(self.middle_directory)
                 elif self.middle_directory == "cargo":
                     rmtree('cargo/')
                     os.mkdir('cargo')
@@ -283,6 +286,9 @@ class Waterlock():
                 
 
 if __name__ == "__main__":
+
+
+
     wl = Waterlock( source_directory=source_directory,
                     end_directory=end_directory, 
                     reserved_space=reserved_space
