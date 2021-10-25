@@ -25,7 +25,7 @@ except:
     pass
 
 try:
-    wl = Waterlock(source_directory='ABSOLUTE/PATH/TO/FOLDER1', \
+    wl = Waterlock(source_directory='ABSOLUTE/PATH/TO/FOLDER', \
                     end_directory='ABSOLUTE/PATH/TO/FOLDER')
     raise Exception('Error: Waterlock is not detecting and rejecting default config!')
 except:
