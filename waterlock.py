@@ -300,10 +300,10 @@ if __name__ == "__main__":
                         reserved_space=reserved_space
                         )
         wl.start()
-        
-    #   wl.dump_cargo()
-    #   wl.verify_middle()
-    #   wl.verify_destination()
+
+        #wl.verify_middle()
+        #wl.verify_destination()
+        #wl.dump_cargo()
 
         del wl
     
