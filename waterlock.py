@@ -7,10 +7,10 @@ import sqlite3
 
 
 '''===== IF RUNNING AS SCRIPT CHANGE THE FOLLOWING FOLDERS ====='''
-# Absolute File Paths Only! Add comma-separated paths (e.g. a list of strings) to support multiple source directories
+# Absolute File Paths Only! Add comma-separated paths (e.g. a list of strings) to support multiple directories
 # If using multiple source and end directories, ensure they are in the same order! See example in comment below.
-source_directory = ['/ABSOLUTE/PATH/TO/FOLDER/'] #['/ABSOLUTE/PATH/ONE', '/ABSOLUTE/PATH/TWO']
-end_directory = ['/ABSOLUTE/PATH/TO/FOLDER/'] #['/ABSOLUTE/PATH/ONE', '/ABSOLUTE/PATH/TWO']
+source_directory = ['/ABSOLUTE/PATH/TO/FOLDER/'] # ['/ABSOLUTE/PATH/ONE', '/ABSOLUTE/PATH/TWO']
+end_directory = ['/ABSOLUTE/PATH/TO/FOLDER/'] # ['/ABSOLUTE/PATH/ONE', '/ABSOLUTE/PATH/TWO']
 reserved_space = 1 # Enter value in Gibibytes
 
 '''============================================================='''
