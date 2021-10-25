@@ -286,7 +286,7 @@ class Waterlock():
                     rmtree(self.middle_directory)
                     os.mkdir(self.middle_directory)
             else:
-                input('Press ENTER to exit')
+                input('Cargo not dumped. Press ENTER to exit')
                 
 
 if __name__ == "__main__":
