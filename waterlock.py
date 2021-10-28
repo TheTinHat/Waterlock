@@ -28,6 +28,9 @@ class Waterlock():
         self.reserved_space = reserved_space * 2**30
         self.con, self.cur = self.connect_db()
         self.retry_count = 0
+        self.skip_all = False
+        self.remove_all = False
+
 
     def check_config(self):
         if 'ABSOLUTE/PATH/TO/FOLDER' in self.source_directory \
@@ -53,8 +56,6 @@ class Waterlock():
         if os.path.exists('config/') is False:
             os.mkdir('config/')
         self.db_name = 'config/' + str(x) + '.db'
-        print(self.middle_directory)
-        print(self.db_name)
 
 
     def sanitize(self, path):
@@ -113,11 +114,12 @@ class Waterlock():
         elif os.path.exists(self.source_directory) and os.path.exists(self.middle_directory):
             self.stage = "middle"
             self.reset()
-            self.check_modify()
+            self.check_changes()
             print(f"Moving data to {self.middle_directory}")
 
         elif os.path.exists(self.middle_directory) and os.path.exists(self.end_directory):
             self.stage = "end"
+            self.remove_on_destination()
             print(f"Moving data to {self.end_directory}")
         
         elif os.path.exists(self.source_directory) is False:
@@ -143,13 +145,12 @@ class Waterlock():
             self.refresh_src_files()
             self.cur.execute('SELECT path FROM data WHERE middle = 0 and end = 0')
             self.file_list = self.cur.fetchall()
-
+        
         elif self.stage == "end":
             self.cur.execute('SELECT path FROM data WHERE middle = 1 and end = 0')
             self.file_list = self.cur.fetchall()
-
         return True
-
+                  
 
     def format_paths(self, src):
         if self.stage == "middle":
@@ -166,6 +167,7 @@ class Waterlock():
 
     def move(self, src, dst):
         dst_dir = os.path.dirname(dst)
+
         if os.path.exists(dst):
             if os.path.getsize(src) != os.path.getsize(dst):
                 os.remove(dst)
@@ -229,7 +231,7 @@ class Waterlock():
 
     def verify_middle(self):
         print("Beginning full file verification of middle")
-        self.cur.execute('SELECT path, hash FROM data WHERE middle = 1 and end = 0')
+        self.cur.execute('SELECT path, hash FROM data WHERE middle = 1 AND end = 0')
         files_to_verify = self.cur.fetchall()
         for src, hash1 in files_to_verify:
             src, dst = self.format_paths(src)
@@ -242,7 +244,7 @@ class Waterlock():
 
     def verify_destination(self):
         print("Beginning full file verification of destination")
-        self.cur.execute('SELECT path, hash FROM data WHERE middle = 1 and end = 1')
+        self.cur.execute('SELECT path, hash FROM data WHERE middle = 1 AND end = 1')
         files_to_verify = self.cur.fetchall()
         for src, hash1 in files_to_verify:
             src, dst = self.format_paths(src)
@@ -254,7 +256,7 @@ class Waterlock():
 
 
     def reset(self):
-        self.cur.execute('SELECT path FROM data WHERE middle = 1 and end = 0')
+        self.cur.execute('SELECT path FROM data WHERE middle = 1 AND end = 0')
         pending_paths = self.cur.fetchall()
         for file_path in pending_paths:
             file_path = file_path[0]
@@ -267,17 +269,80 @@ class Waterlock():
         return True
 
 
-    def check_modify(self):
+    def remove_on_destination(self):
+        if self.stage == "end":
+            self.cur.execute('SELECT path FROM data WHERE middle = -2 AND end = -2')
+            pending_deletions = self.cur.fetchall()
+            for file in pending_deletions:
+                file = file[0]
+                file_end = file.replace(self.source_directory, self.end_directory)
+                file_end = self.sanitize(file_end)
+                if os.path.exists(file_end):
+                    if self.skip_all == True:
+                        pass
+                    elif self.remove_all == True:
+                        print(f'Removing {file_end}')
+                        os.remove(file_end)
+                    else:
+                        choice = input(f"{file_end} is marked for removal. \nEnter (r) to remove, \n(s) to skip,\
+                             \n(ra) to always remove, or \n(sa) to always skip: ")
+                        if choice == "r":
+                            print(f'Removing {file_end}')
+                            os.remove(file_end)
+                        elif choice == "s":
+                            pass
+                        elif choice == "ra":
+                            print(f'Removing {file_end}')
+                            os.remove(file_end)
+                            self.remove_all = True
+                        elif choice == "sa":
+                            self.skip_all = True
+                        else:
+                            print("Invalid choice. Quitting...")
+                            quit()
+                self.cur.execute('UPDATE data SET middle = -1, end = -1 WHERE path = ?', (file,))
+                self.con.commit() 
+            return True
+
+
+    def check_changes(self):
         self.cur.execute('SELECT path, last_modified FROM data')
         files = self.cur.fetchall()
         for file, last_modified in files:
-            modify_time = os.path.getmtime(file)
-            if modify_time > last_modified:
-                hash = self.hash(file)
-                self.cur.execute('UPDATE data SET last_modified = ?, \
-                middle = 0, end = 0, hash = ? WHERE path = ?', (modify_time, hash, file))
-                print(f'{file} was modified since last transfer, marking as unmoved in database') 
+            if os.path.exists(file) is False:
+                if self.skip_all == True: 
+                    self.cur.execute('UPDATE data SET middle = -1, end = -1 WHERE path = ?', (file,))
+                    self.con.commit()
+                elif self.remove_all == True:
+                    self.cur.execute('UPDATE data SET middle = -2, end = -2 WHERE path = ?', (file,))
+                    self.con.commit()
+                else:
+                    choice = input(f'{file} could not be found on source. \nEnter (s) to skip this file in the future,\
+                         \n(r) to mark for removal from destination, \n(sa) always skip files, \n(ra) to always remove files \n(s, r, sa, sr): ')
+                    if choice == "s":
+                        self.cur.execute('UPDATE data SET middle = -1, end = -1 WHERE path = ?', (file,))
+                        self.con.commit()
+                    elif choice == "r":
+                        self.cur.execute('UPDATE data SET middle = -2, end = -2 WHERE path = ?', (file,))
+                        self.con.commit()
+                    elif choice == "sa":
+                        self.skip_all = True
+                    elif choice == "ra":
+                        self.remove_all = True
+                        self.cur.execute('UPDATE data SET middle = -2, end = -2 WHERE path = ?', (file,))
+                        self.con.commit()
+                    else:
+                        print("Invalid choice. Quitting...")
+                        quit()
+            else:
+                modify_time = os.path.getmtime(file)
+                if modify_time > last_modified:
+                    hash = self.hash(file)
+                    self.cur.execute('UPDATE data SET last_modified = ?, \
+                    middle = 0, end = 0, hash = ? WHERE path = ?', (modify_time, hash, file))
+                    print(f'{file} was modified since last transfer, marking as unmoved in database') 
         return True
+
 
     def dump_cargo(self):
         if self.stage == "end" and self.success == True:
@@ -287,7 +352,9 @@ class Waterlock():
                     os.mkdir(self.middle_directory)
             else:
                 input('Cargo not dumped. Press ENTER to exit')
-                
+
+
+
 
 if __name__ == "__main__":
 
