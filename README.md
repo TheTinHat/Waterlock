@@ -1,6 +1,6 @@
 # Waterlock
 
-Waterlock is a Python script meant for incrementally transferring data between three folder locations in two separate stages. It performs hash verification and persistently tracks data transfer progress using SQLite.
+Waterlock is a Python script meant for incrementally transferring data between three folder locations in two separate stages. It performs hash verification and persistently tracks data transfer progress using SQLite. You can learn more about it in [this blog post](https://swanlund.space/waterlock)
 
 *Waterlock is under rapid development. This means that newer versions of the script will likely not be compatible with existing deployments. **Use at your own discretion.**  I am not responsible for any lost data.*
 
