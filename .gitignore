@@ -1,5 +1,4 @@
 test/*
 __pycache__
-waterlock.db
-config/
-cargo/
+config.db
+
