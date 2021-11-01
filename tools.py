@@ -1,5 +1,5 @@
 from hashlib import blake2b
-
+import os
 
 def sanitize(f_path):
     f_path = f_path.replace("\\","/").split('/')
@@ -23,3 +23,6 @@ def sizeof(num, suffix="B"):
             return f"{num:3.1f}{unit}{suffix}"
         num /= 1024.0
     return f"{num:.1f}Yi{suffix}"
+
+def ms_modtime(filepath):
+    return int(os.path.getmtime(filepath)*1000)

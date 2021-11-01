@@ -14,6 +14,9 @@ def create_dataset(n):
 
 def clear_dataset():
     rmtree('test/')
+    rmtree('cargo')
+
+
 
 def reset_db():
     if os.path.exists('config.db'):
@@ -34,7 +37,8 @@ def batch_init(src, dst):
         src_i = src + 'test_' + str(i)
         wl.Initialize(job_name=name, \
             source_directory=src_i, \
-            destination_directory=dst)
+            destination_directory=dst,
+            days_to_prune = 0.00347)
     return jobs
 
 def batch_add_new(jobs):
@@ -43,19 +47,23 @@ def batch_add_new(jobs):
         wl.add_new_files(job)
         
 
-reset_db()
-clear_dataset()
-create_dataset(3)
+#reset_db()
+#clear_dataset()
+#create_dataset(3)
+#os.makedirs('test/dst/job_1')
+
 src, dst = make_paths()
 
 wl = Waterlock()
+#wl.edit_job('job_0', days_to_prune=0.00069)
+#wl.edit_job('job_1', days_to_prune=0.00069)
+wl.edit_all_jobs(days_to_prune=0.0013)
 
 jobs = batch_init(src,dst)
 batch_add_new(jobs)
 
 wl.start('job_0')
-#wl.start('job_1')
-
-create_dataset(2)
-
-wl.start('job_0')
+wl.start('job_1')
+#print("TRYING AGAIN")
+#wl.start('job_0', same_system=True)
+#wl.start('job_1', same_system=True)
