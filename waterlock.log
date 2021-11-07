@@ -1,123 +1,123 @@
-root - INFO - 2021-11-06 19:10:26,604 - Edited job_0 - {'days_to_prune': 0.00069}
-root - INFO - 2021-11-06 19:10:26,606 - Edited job_1 - {'days_to_prune': 0.00069}
-root - INFO - 2021-11-06 19:10:26,607 - Edited All Jobs: {'days_to_prune': 0.0013}
-root - INFO - 2021-11-06 19:10:26,617 - Initialized job_0
-root - INFO - 2021-11-06 19:10:26,625 - Initialized job_1
-root - INFO - 2021-11-06 19:10:26,625 - Scanning for new files for job_0
-root - INFO - 2021-11-06 19:10:26,851 - Scanning for new files for job_1
-root - INFO - 2021-11-06 19:10:27,099 - Scanning for file changes for job_0
-root - INFO - 2021-11-06 19:10:27,099 - Scanning for new files for job_0
-root - INFO - 2021-11-06 19:10:27,364 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/0/0.random
-root - INFO - 2021-11-06 19:10:27,378 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/0/1.random
-root - INFO - 2021-11-06 19:10:27,389 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/0/2.random
-root - INFO - 2021-11-06 19:10:27,402 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/1/0.random
-root - INFO - 2021-11-06 19:10:27,415 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/1/1.random
-root - INFO - 2021-11-06 19:10:27,427 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/1/2.random
-root - INFO - 2021-11-06 19:10:27,440 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/2/0.random
-root - INFO - 2021-11-06 19:10:27,453 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/2/1.random
-root - INFO - 2021-11-06 19:10:27,466 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/2/2.random
-root - INFO - 2021-11-06 19:10:27,480 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/0/0.random
-root - INFO - 2021-11-06 19:10:27,495 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/0/1.random
-root - INFO - 2021-11-06 19:10:27,508 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/0/2.random
-root - INFO - 2021-11-06 19:10:27,521 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/1/0.random
-root - INFO - 2021-11-06 19:10:27,535 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/1/1.random
-root - INFO - 2021-11-06 19:10:27,549 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/1/2.random
-root - INFO - 2021-11-06 19:10:27,563 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/2/0.random
-root - INFO - 2021-11-06 19:10:27,574 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/2/1.random
-root - INFO - 2021-11-06 19:10:27,587 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/2/2.random
-root - INFO - 2021-11-06 19:10:27,599 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/0/0.random
-root - INFO - 2021-11-06 19:10:27,612 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/0/1.random
-root - INFO - 2021-11-06 19:10:27,625 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/0/2.random
-root - INFO - 2021-11-06 19:10:27,639 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/1/0.random
-root - INFO - 2021-11-06 19:10:27,652 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/1/1.random
-root - INFO - 2021-11-06 19:10:27,666 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/1/2.random
-root - INFO - 2021-11-06 19:10:27,679 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/2/0.random
-root - INFO - 2021-11-06 19:10:27,693 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/2/1.random
-root - INFO - 2021-11-06 19:10:27,707 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/2/2.random
-root - INFO - 2021-11-06 19:10:27,720 - Scanning for file changes for job_1
-root - INFO - 2021-11-06 19:10:27,720 - Scanning for new files for job_1
-root - INFO - 2021-11-06 19:10:27,973 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/0/0.random
-root - INFO - 2021-11-06 19:10:27,987 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/0/1.random
-root - INFO - 2021-11-06 19:10:27,999 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/0/2.random
-root - INFO - 2021-11-06 19:10:28,012 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/1/0.random
-root - INFO - 2021-11-06 19:10:28,025 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/1/1.random
-root - INFO - 2021-11-06 19:10:28,037 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/1/2.random
-root - INFO - 2021-11-06 19:10:28,050 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/2/0.random
-root - INFO - 2021-11-06 19:10:28,062 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/2/1.random
-root - INFO - 2021-11-06 19:10:28,074 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/2/2.random
-root - INFO - 2021-11-06 19:10:28,085 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/0/0.random
-root - INFO - 2021-11-06 19:10:28,098 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/0/1.random
-root - INFO - 2021-11-06 19:10:28,110 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/0/2.random
-root - INFO - 2021-11-06 19:10:28,122 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/1/0.random
-root - INFO - 2021-11-06 19:10:28,135 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/1/1.random
-root - INFO - 2021-11-06 19:10:28,148 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/1/2.random
-root - INFO - 2021-11-06 19:10:28,159 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/2/0.random
-root - INFO - 2021-11-06 19:10:28,172 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/2/1.random
-root - INFO - 2021-11-06 19:10:28,189 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/2/2.random
-root - INFO - 2021-11-06 19:10:28,205 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/0/0.random
-root - INFO - 2021-11-06 19:10:28,220 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/0/1.random
-root - INFO - 2021-11-06 19:10:28,235 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/0/2.random
-root - INFO - 2021-11-06 19:10:28,249 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/1/0.random
-root - INFO - 2021-11-06 19:10:28,261 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/1/1.random
-root - INFO - 2021-11-06 19:10:28,275 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/1/2.random
-root - INFO - 2021-11-06 19:10:28,288 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/2/0.random
-root - INFO - 2021-11-06 19:10:28,302 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/2/1.random
-root - INFO - 2021-11-06 19:10:28,316 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/2/2.random
-root - INFO - 2021-11-06 19:10:28,328 - Scanning for file changes for job_0
-root - INFO - 2021-11-06 19:10:28,328 - Scanning for new files for job_0
-root - INFO - 2021-11-06 19:10:28,345 - Copying cargo/job_0/0/0/0.random
-root - INFO - 2021-11-06 19:10:28,359 - Copying cargo/job_0/0/0/1.random
-root - INFO - 2021-11-06 19:10:28,371 - Copying cargo/job_0/0/0/2.random
-root - INFO - 2021-11-06 19:10:28,387 - Copying cargo/job_0/0/1/0.random
-root - INFO - 2021-11-06 19:10:28,400 - Copying cargo/job_0/0/1/1.random
-root - INFO - 2021-11-06 19:10:28,411 - Copying cargo/job_0/0/1/2.random
-root - INFO - 2021-11-06 19:10:28,423 - Copying cargo/job_0/0/2/0.random
-root - INFO - 2021-11-06 19:10:28,435 - Copying cargo/job_0/0/2/1.random
-root - INFO - 2021-11-06 19:10:28,446 - Copying cargo/job_0/0/2/2.random
-root - INFO - 2021-11-06 19:10:28,458 - Copying cargo/job_0/1/0/0.random
-root - INFO - 2021-11-06 19:10:28,470 - Copying cargo/job_0/1/0/1.random
-root - INFO - 2021-11-06 19:10:28,482 - Copying cargo/job_0/1/0/2.random
-root - INFO - 2021-11-06 19:10:28,495 - Copying cargo/job_0/1/1/0.random
-root - INFO - 2021-11-06 19:10:28,507 - Copying cargo/job_0/1/1/1.random
-root - INFO - 2021-11-06 19:10:28,518 - Copying cargo/job_0/1/1/2.random
-root - INFO - 2021-11-06 19:10:28,530 - Copying cargo/job_0/1/2/0.random
-root - INFO - 2021-11-06 19:10:28,542 - Copying cargo/job_0/1/2/1.random
-root - INFO - 2021-11-06 19:10:28,553 - Copying cargo/job_0/1/2/2.random
-root - INFO - 2021-11-06 19:10:28,565 - Copying cargo/job_0/2/0/0.random
-root - INFO - 2021-11-06 19:10:28,577 - Copying cargo/job_0/2/0/1.random
-root - INFO - 2021-11-06 19:10:28,589 - Copying cargo/job_0/2/0/2.random
-root - INFO - 2021-11-06 19:10:28,601 - Copying cargo/job_0/2/1/0.random
-root - INFO - 2021-11-06 19:10:28,612 - Copying cargo/job_0/2/1/1.random
-root - INFO - 2021-11-06 19:10:28,624 - Copying cargo/job_0/2/1/2.random
-root - INFO - 2021-11-06 19:10:28,635 - Copying cargo/job_0/2/2/0.random
-root - INFO - 2021-11-06 19:10:28,646 - Copying cargo/job_0/2/2/1.random
-root - INFO - 2021-11-06 19:10:28,659 - Copying cargo/job_0/2/2/2.random
-root - INFO - 2021-11-06 19:10:28,672 - Scanning for file changes for job_1
-root - INFO - 2021-11-06 19:10:28,672 - Scanning for new files for job_1
-root - INFO - 2021-11-06 19:10:28,690 - Copying cargo/job_1/0/0/0.random
-root - INFO - 2021-11-06 19:10:28,702 - Copying cargo/job_1/0/0/1.random
-root - INFO - 2021-11-06 19:10:28,714 - Copying cargo/job_1/0/0/2.random
-root - INFO - 2021-11-06 19:10:28,726 - Copying cargo/job_1/0/1/0.random
-root - INFO - 2021-11-06 19:10:28,738 - Copying cargo/job_1/0/1/1.random
-root - INFO - 2021-11-06 19:10:28,752 - Copying cargo/job_1/0/1/2.random
-root - INFO - 2021-11-06 19:10:28,766 - Copying cargo/job_1/0/2/0.random
-root - INFO - 2021-11-06 19:10:28,781 - Copying cargo/job_1/0/2/1.random
-root - INFO - 2021-11-06 19:10:28,795 - Copying cargo/job_1/0/2/2.random
-root - INFO - 2021-11-06 19:10:28,808 - Copying cargo/job_1/1/0/0.random
-root - INFO - 2021-11-06 19:10:28,821 - Copying cargo/job_1/1/0/1.random
-root - INFO - 2021-11-06 19:10:28,834 - Copying cargo/job_1/1/0/2.random
-root - INFO - 2021-11-06 19:10:28,847 - Copying cargo/job_1/1/1/0.random
-root - INFO - 2021-11-06 19:10:28,860 - Copying cargo/job_1/1/1/1.random
-root - INFO - 2021-11-06 19:10:28,872 - Copying cargo/job_1/1/1/2.random
-root - INFO - 2021-11-06 19:10:28,885 - Copying cargo/job_1/1/2/0.random
-root - INFO - 2021-11-06 19:10:28,897 - Copying cargo/job_1/1/2/1.random
-root - INFO - 2021-11-06 19:10:28,909 - Copying cargo/job_1/1/2/2.random
-root - INFO - 2021-11-06 19:10:28,922 - Copying cargo/job_1/2/0/0.random
-root - INFO - 2021-11-06 19:10:28,934 - Copying cargo/job_1/2/0/1.random
-root - INFO - 2021-11-06 19:10:28,946 - Copying cargo/job_1/2/0/2.random
-root - INFO - 2021-11-06 19:10:28,958 - Copying cargo/job_1/2/1/0.random
-root - INFO - 2021-11-06 19:10:28,970 - Copying cargo/job_1/2/1/1.random
-root - INFO - 2021-11-06 19:10:28,982 - Copying cargo/job_1/2/1/2.random
-root - INFO - 2021-11-06 19:10:28,994 - Copying cargo/job_1/2/2/0.random
-root - INFO - 2021-11-06 19:10:29,007 - Copying cargo/job_1/2/2/1.random
-root - INFO - 2021-11-06 19:10:29,020 - Copying cargo/job_1/2/2/2.random
+root - INFO - 2021-11-06 19:36:31,417 - Edited job_0 - {'days_to_prune': 0.00069}
+root - INFO - 2021-11-06 19:36:31,419 - Edited job_1 - {'days_to_prune': 0.00069}
+root - INFO - 2021-11-06 19:36:31,420 - Edited all jobs - {'days_to_prune': 0.0013}
+root - INFO - 2021-11-06 19:36:31,429 - Initialized job_0
+root - INFO - 2021-11-06 19:36:31,439 - Initialized job_1
+root - INFO - 2021-11-06 19:36:31,439 - Scanning for new files for job_0
+root - INFO - 2021-11-06 19:36:31,659 - Scanning for new files for job_1
+root - INFO - 2021-11-06 19:36:31,896 - Scanning for file changes for job_0
+root - INFO - 2021-11-06 19:36:31,896 - Scanning for new files for job_0
+root - INFO - 2021-11-06 19:36:32,167 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/0/0.random
+root - INFO - 2021-11-06 19:36:32,180 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/0/1.random
+root - INFO - 2021-11-06 19:36:32,191 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/0/2.random
+root - INFO - 2021-11-06 19:36:32,203 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/1/0.random
+root - INFO - 2021-11-06 19:36:32,216 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/1/1.random
+root - INFO - 2021-11-06 19:36:32,228 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/1/2.random
+root - INFO - 2021-11-06 19:36:32,241 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/2/0.random
+root - INFO - 2021-11-06 19:36:32,253 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/2/1.random
+root - INFO - 2021-11-06 19:36:32,265 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/0/2/2.random
+root - INFO - 2021-11-06 19:36:32,276 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/0/0.random
+root - INFO - 2021-11-06 19:36:32,289 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/0/1.random
+root - INFO - 2021-11-06 19:36:32,301 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/0/2.random
+root - INFO - 2021-11-06 19:36:32,313 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/1/0.random
+root - INFO - 2021-11-06 19:36:32,324 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/1/1.random
+root - INFO - 2021-11-06 19:36:32,337 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/1/2.random
+root - INFO - 2021-11-06 19:36:32,347 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/2/0.random
+root - INFO - 2021-11-06 19:36:32,360 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/2/1.random
+root - INFO - 2021-11-06 19:36:32,443 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/1/2/2.random
+root - INFO - 2021-11-06 19:36:32,456 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/0/0.random
+root - INFO - 2021-11-06 19:36:32,470 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/0/1.random
+root - INFO - 2021-11-06 19:36:32,483 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/0/2.random
+root - INFO - 2021-11-06 19:36:32,495 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/1/0.random
+root - INFO - 2021-11-06 19:36:32,508 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/1/1.random
+root - INFO - 2021-11-06 19:36:32,522 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/1/2.random
+root - INFO - 2021-11-06 19:36:32,534 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/2/0.random
+root - INFO - 2021-11-06 19:36:32,545 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/2/1.random
+root - INFO - 2021-11-06 19:36:32,594 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_0/2/2/2.random
+root - INFO - 2021-11-06 19:36:32,606 - Scanning for file changes for job_1
+root - INFO - 2021-11-06 19:36:32,606 - Scanning for new files for job_1
+root - INFO - 2021-11-06 19:36:32,842 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/0/0.random
+root - INFO - 2021-11-06 19:36:32,853 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/0/1.random
+root - INFO - 2021-11-06 19:36:32,865 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/0/2.random
+root - INFO - 2021-11-06 19:36:32,876 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/1/0.random
+root - INFO - 2021-11-06 19:36:32,887 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/1/1.random
+root - INFO - 2021-11-06 19:36:32,898 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/1/2.random
+root - INFO - 2021-11-06 19:36:32,910 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/2/0.random
+root - INFO - 2021-11-06 19:36:32,922 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/2/1.random
+root - INFO - 2021-11-06 19:36:32,934 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/0/2/2.random
+root - INFO - 2021-11-06 19:36:32,946 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/0/0.random
+root - INFO - 2021-11-06 19:36:32,959 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/0/1.random
+root - INFO - 2021-11-06 19:36:32,972 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/0/2.random
+root - INFO - 2021-11-06 19:36:32,984 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/1/0.random
+root - INFO - 2021-11-06 19:36:32,998 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/1/1.random
+root - INFO - 2021-11-06 19:36:33,009 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/1/2.random
+root - INFO - 2021-11-06 19:36:33,021 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/2/0.random
+root - INFO - 2021-11-06 19:36:33,032 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/2/1.random
+root - INFO - 2021-11-06 19:36:33,043 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/1/2/2.random
+root - INFO - 2021-11-06 19:36:33,089 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/0/0.random
+root - INFO - 2021-11-06 19:36:33,101 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/0/1.random
+root - INFO - 2021-11-06 19:36:33,112 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/0/2.random
+root - INFO - 2021-11-06 19:36:33,124 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/1/0.random
+root - INFO - 2021-11-06 19:36:33,135 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/1/1.random
+root - INFO - 2021-11-06 19:36:33,147 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/1/2.random
+root - INFO - 2021-11-06 19:36:33,158 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/2/0.random
+root - INFO - 2021-11-06 19:36:33,169 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/2/1.random
+root - INFO - 2021-11-06 19:36:33,181 - Copying C:/Users/David/Documents/Sync/software/repositories/Waterlock/test/src/test_1/2/2/2.random
+root - INFO - 2021-11-06 19:36:33,192 - Scanning for file changes for job_0
+root - INFO - 2021-11-06 19:36:33,192 - Scanning for new files for job_0
+root - INFO - 2021-11-06 19:36:33,208 - Copying cargo/job_0/0/0/0.random
+root - INFO - 2021-11-06 19:36:33,220 - Copying cargo/job_0/0/0/1.random
+root - INFO - 2021-11-06 19:36:33,232 - Copying cargo/job_0/0/0/2.random
+root - INFO - 2021-11-06 19:36:33,245 - Copying cargo/job_0/0/1/0.random
+root - INFO - 2021-11-06 19:36:33,258 - Copying cargo/job_0/0/1/1.random
+root - INFO - 2021-11-06 19:36:33,270 - Copying cargo/job_0/0/1/2.random
+root - INFO - 2021-11-06 19:36:33,282 - Copying cargo/job_0/0/2/0.random
+root - INFO - 2021-11-06 19:36:33,293 - Copying cargo/job_0/0/2/1.random
+root - INFO - 2021-11-06 19:36:33,304 - Copying cargo/job_0/0/2/2.random
+root - INFO - 2021-11-06 19:36:33,316 - Copying cargo/job_0/1/0/0.random
+root - INFO - 2021-11-06 19:36:33,328 - Copying cargo/job_0/1/0/1.random
+root - INFO - 2021-11-06 19:36:33,340 - Copying cargo/job_0/1/0/2.random
+root - INFO - 2021-11-06 19:36:33,353 - Copying cargo/job_0/1/1/0.random
+root - INFO - 2021-11-06 19:36:33,368 - Copying cargo/job_0/1/1/1.random
+root - INFO - 2021-11-06 19:36:33,381 - Copying cargo/job_0/1/1/2.random
+root - INFO - 2021-11-06 19:36:33,394 - Copying cargo/job_0/1/2/0.random
+root - INFO - 2021-11-06 19:36:33,405 - Copying cargo/job_0/1/2/1.random
+root - INFO - 2021-11-06 19:36:33,489 - Copying cargo/job_0/1/2/2.random
+root - INFO - 2021-11-06 19:36:33,503 - Copying cargo/job_0/2/0/0.random
+root - INFO - 2021-11-06 19:36:33,516 - Copying cargo/job_0/2/0/1.random
+root - INFO - 2021-11-06 19:36:33,528 - Copying cargo/job_0/2/0/2.random
+root - INFO - 2021-11-06 19:36:33,540 - Copying cargo/job_0/2/1/0.random
+root - INFO - 2021-11-06 19:36:33,553 - Copying cargo/job_0/2/1/1.random
+root - INFO - 2021-11-06 19:36:33,566 - Copying cargo/job_0/2/1/2.random
+root - INFO - 2021-11-06 19:36:33,579 - Copying cargo/job_0/2/2/0.random
+root - INFO - 2021-11-06 19:36:33,591 - Copying cargo/job_0/2/2/1.random
+root - INFO - 2021-11-06 19:36:33,642 - Copying cargo/job_0/2/2/2.random
+root - INFO - 2021-11-06 19:36:33,653 - Scanning for file changes for job_1
+root - INFO - 2021-11-06 19:36:33,654 - Scanning for new files for job_1
+root - INFO - 2021-11-06 19:36:33,671 - Copying cargo/job_1/0/0/0.random
+root - INFO - 2021-11-06 19:36:33,683 - Copying cargo/job_1/0/0/1.random
+root - INFO - 2021-11-06 19:36:33,695 - Copying cargo/job_1/0/0/2.random
+root - INFO - 2021-11-06 19:36:33,707 - Copying cargo/job_1/0/1/0.random
+root - INFO - 2021-11-06 19:36:33,717 - Copying cargo/job_1/0/1/1.random
+root - INFO - 2021-11-06 19:36:33,727 - Copying cargo/job_1/0/1/2.random
+root - INFO - 2021-11-06 19:36:33,738 - Copying cargo/job_1/0/2/0.random
+root - INFO - 2021-11-06 19:36:33,749 - Copying cargo/job_1/0/2/1.random
+root - INFO - 2021-11-06 19:36:33,760 - Copying cargo/job_1/0/2/2.random
+root - INFO - 2021-11-06 19:36:33,771 - Copying cargo/job_1/1/0/0.random
+root - INFO - 2021-11-06 19:36:33,782 - Copying cargo/job_1/1/0/1.random
+root - INFO - 2021-11-06 19:36:33,793 - Copying cargo/job_1/1/0/2.random
+root - INFO - 2021-11-06 19:36:33,805 - Copying cargo/job_1/1/1/0.random
+root - INFO - 2021-11-06 19:36:33,817 - Copying cargo/job_1/1/1/1.random
+root - INFO - 2021-11-06 19:36:33,828 - Copying cargo/job_1/1/1/2.random
+root - INFO - 2021-11-06 19:36:33,841 - Copying cargo/job_1/1/2/0.random
+root - INFO - 2021-11-06 19:36:33,852 - Copying cargo/job_1/1/2/1.random
+root - INFO - 2021-11-06 19:36:33,863 - Copying cargo/job_1/1/2/2.random
+root - INFO - 2021-11-06 19:36:33,911 - Copying cargo/job_1/2/0/0.random
+root - INFO - 2021-11-06 19:36:33,924 - Copying cargo/job_1/2/0/1.random
+root - INFO - 2021-11-06 19:36:33,936 - Copying cargo/job_1/2/0/2.random
+root - INFO - 2021-11-06 19:36:33,948 - Copying cargo/job_1/2/1/0.random
+root - INFO - 2021-11-06 19:36:33,961 - Copying cargo/job_1/2/1/1.random
+root - INFO - 2021-11-06 19:36:33,973 - Copying cargo/job_1/2/1/2.random
+root - INFO - 2021-11-06 19:36:33,986 - Copying cargo/job_1/2/2/0.random
+root - INFO - 2021-11-06 19:36:34,000 - Copying cargo/job_1/2/2/1.random
+root - INFO - 2021-11-06 19:36:34,013 - Copying cargo/job_1/2/2/2.random

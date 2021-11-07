@@ -36,7 +36,7 @@ def batch_init(src, dst):
         name = 'job_' + str(i)
         jobs.append(name)
         src_i = src + 'test_' + str(i)
-        wl.Initialize(job_name=name, \
+        wl.initialize(job_name=name, \
             source_directory=src_i, \
             destination_directory=dst,
             days_to_prune = 0.00347)
@@ -46,10 +46,10 @@ def batch_add_new(jobs):
     global wl
     for job in jobs:
         wl.add_new_files(job)
-        
+
 
 reset_db()
-clear_dataset()
+#clear_dataset()
 create_dataset(3)
 #os.makedirs('test/dst/job_1')
 
