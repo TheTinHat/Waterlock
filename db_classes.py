@@ -8,22 +8,22 @@ Base = declarative_base()
 class Files(Base):
     __tablename__ = 'files'
 
-    source_path = Column(String, unique=True, primary_key=True)
-    middle_path = Column(String)
-    destination_path = Column(String)
+    source = Column(String, unique=True, primary_key=True)
+    middle = Column(String)
+    destination = Column(String)
     size = Column(Integer)
     checksum = Column(String)
-    modtime_ms = Column(REAL)
-    progress = Column(String)
+    modtime = Column(REAL)
+    progress = Column(Integer)
     job = Column(String, ForeignKey('jobs.name'))
 
 class FileVersions(Base):
     __tablename__ = 'fileversions'
-    version_path = Column(String, unique=True, primary_key=True)
-    destination_path = Column(String, ForeignKey('files.destination_path'))
+    version = Column(String, unique=True, primary_key=True)
+    destination = Column(String, ForeignKey('files.destination'))
     size = Column(Integer)
     checksum = Column(String)
-    modtime_ms = Column(REAL) 
+    modtime = Column(REAL)
     job = Column(String, ForeignKey('jobs.name'))
     status = Column(String)
 

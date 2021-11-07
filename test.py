@@ -45,10 +45,10 @@ def batch_init(src, dst):
 def batch_add_new(jobs):
     global wl
     for job in jobs:
-        wl.add_new_files(job)
+        wl._add_new_files(job)
 
 
-reset_db()
+#reset_db()
 #clear_dataset()
 create_dataset(3)
 #os.makedirs('test/dst/job_1')

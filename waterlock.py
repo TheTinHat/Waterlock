@@ -10,10 +10,6 @@ from sqlalchemy.orm import sessionmaker
 from db_classes import Files, Jobs, FileVersions
 
 
-
-
-
-
 class Waterlock():
     def __init__(self, engine_path='sqlite:///config.db'):
         self.engine = create_engine(engine_path)
@@ -26,20 +22,22 @@ class Waterlock():
                             level=logging.INFO, \
                             format='%(name)s - %(levelname)s - %(asctime)s - %(message)s')
 
+
     @property
     def job_count(self):
         return self.session.query(Jobs).count()
 
+
     def initialize(self,
-                    job_name = '',
-                    source_directory = '',
-                    destination_directory = '',
-                    middle_directory = 'cargo',
-                    reserved_space = 1,
-                    sync_deletions = False,
-                    dump_cargo = False,
-                    days_to_prune = 90
-                    ):
+                job_name = '',
+                source_directory = '',
+                destination_directory = '',
+                middle_directory = 'cargo',
+                reserved_space = 1,
+                sync_deletions = False,
+                dump_cargo = False,
+                days_to_prune = 90
+                ):
         session = self.session
 
         assert os.path.isabs(source_directory), \
@@ -47,24 +45,24 @@ class Waterlock():
         assert os.path.isabs(destination_directory), \
             "Error, destination directory path is not absolute"
 
-        source_directory = self.sanitize(source_directory)
-        destination_directory = self.sanitize(destination_directory)
-        middle_directory = self.sanitize(middle_directory)
+        source_directory = self._sanitize(source_directory)
+        destination_directory = self._sanitize(destination_directory)
+        middle_directory = self._sanitize(middle_directory)
         destination_directory = '/'.join([destination_directory, str(job_name)])
         middle_directory = '/'.join([middle_directory, str(job_name)])
         os.makedirs(middle_directory, exist_ok=True)
 
         if session.query(exists().where(Jobs.name==job_name)).scalar() is False:
             config = Jobs( \
-                name = job_name,
-                source_directory = source_directory, \
-                middle_directory = middle_directory, \
-                destination_directory = destination_directory, \
-                reserved_space = reserved_space * 2**30, \
-                sync_deletions = sync_deletions, \
-                dump_cargo = dump_cargo,
-                hostname = gethostname(),
-                days_to_prune = days_to_prune)
+                        name = job_name,
+                        source_directory = source_directory, \
+                        middle_directory = middle_directory, \
+                        destination_directory = destination_directory, \
+                        reserved_space = reserved_space * 2**30, \
+                        sync_deletions = sync_deletions, \
+                        dump_cargo = dump_cargo,
+                        hostname = gethostname(),
+                        days_to_prune = days_to_prune)
 
             session.add(config)
             session.commit()
@@ -75,8 +73,8 @@ class Waterlock():
 
     def edit_job(self, job, **kwargs):
         for key, value in kwargs.items():
-            self.session.query(Jobs).where(Jobs.name == job).\
-                update({str(key) : value})
+            self.session.query(Jobs).where(Jobs.name == job)\
+                .update({str(key) : value})
         logging.info('Edited %s - %s', job, kwargs)
         self.session.commit()
 
@@ -91,9 +89,9 @@ class Waterlock():
 
     def free_space(self, job):
         src, mid, dst = self.session.query(Jobs.source_directory, \
-            Jobs.middle_directory, \
-            Jobs.destination_directory)\
-            .where(Jobs.name == job).one()
+                        Jobs.middle_directory, \
+                        Jobs.destination_directory)\
+                        .where(Jobs.name == job).one()
 
         source_free = middle_free = destination_free = False
 
@@ -109,24 +107,24 @@ class Waterlock():
         return source_free, middle_free, destination_free
 
 
-    def sanitize(self, file):
+    def _sanitize(self, file):
         file = file.replace("\\","/").split('/')
         file = [x for x in file if x != '']
         file = '/'.join(file)
         return file
 
 
-    def hash(self, file):
-        hash = blake2b()
+    def _hash(self, file):
+        blake = blake2b()
         with open(file, 'rb') as f:
             chunk = f.read(32768)
             while len(chunk) > 0:
-                hash.update(chunk)
+                blake.update(chunk)
                 chunk = f.read(32768)
-        return str(hash.hexdigest())
+        return str(blake.hexdigest())
 
 
-    def add_new_files(self, job):
+    def _add_new_files(self, job):
         logging.info('Scanning for new files for %s', job)
         src, mid, dst = self.session.query(\
             Jobs.source_directory, \
@@ -135,66 +133,65 @@ class Waterlock():
             .where(Jobs.name == job).one()
 
         for folder, _, file_list in os.walk(src):
-            folder = self.sanitize(folder)
+            folder = self._sanitize(folder)
             for file in file_list:
-                source_path = self.sanitize(file)
-                source_path = '/'.join([folder, source_path])
-                middle_path = source_path.replace(src, mid)
-                dest_path = source_path.replace(src, dst)
+                source = self._sanitize(file)
+                source = '/'.join([folder, source])
+                middle = source.replace(src, mid)
+                dest_path = source.replace(src, dst)
                 if self.session.query(exists().where(\
-                        Files.source_path == source_path)).scalar() is False:
+                        Files.source == source)).scalar() is False:
 
                     new_file = Files( \
-                        source_path = source_path,
-                        middle_path = middle_path,
-                        destination_path = dest_path,
-                        progress = "source",
-                        size = os.path.getsize(source_path),
-                        modtime_ms = os.path.getmtime(source_path),
+                        source = source,
+                        middle = middle,
+                        destination = dest_path,
+                        progress = 0,
+                        size = os.path.getsize(source),
+                        modtime = os.path.getmtime(source),
                         job = job)
                     self.session.add(new_file)
                     self.session.commit()
         return True
 
 
-    def refresh_source(self, job):
+    def _refresh_source(self, job):
         logging.info('Scanning for file changes for %s', job)
-        self.add_new_files(job)
+        self._add_new_files(job)
         file_list = self.session.query(Files)\
             .where(Files.job == job).all()
         for file in file_list:
-            if os.path.exists(file.source_path):
-                if os.path.getmtime(file.source_path) != file.modtime_ms or \
-                        os.path.getsize(file.source_path) != file.size:
-                    logging.info('Updating %s', file.source_path)
-                    self.create_db_version(file)
-                    self.update_modtime(file)
-                    self.update_size(file)
-                    self.update_checksum(file)
+            if os.path.exists(file.source):
+                if os.path.getmtime(file.source) > file.modtime:
+                    logging.info('Updating %s', file.source)
+                    self._create_db_version(file)
+                    self._update_modtime(file)
+                    self._update_size(file)
+                    self._update_checksum(file)
             if file.checksum is None:
-                self.update_checksum(file)
+                self._update_checksum(file)
 
 
-    def update_modtime(self, file):
-        mod_time = os.path.getmtime(file.source_path)
-        self.session.query(Files).where(Files.source_path == file.source_path).\
-            update({'modtime_ms' : mod_time,
-                    'progress' : 'source'})
+    def _update_modtime(self, file):
+        mod_time = os.path.getmtime(file.source)
+        self.session.query(Files).where(Files.source == file.source).\
+            update({'modtime' : mod_time,
+                    'progress' : 0})
         self.session.commit()
         return mod_time
 
 
-    def update_size(self, file):
-        new_size = os.path.getsize(file.source_path)
-        self.session.query(Files).where(Files.source_path == file.source_path).\
+    def _update_size(self, file):
+        new_size = os.path.getsize(file.source)
+        self.session.query(Files).where(Files.source == file.source).\
             update({'size' : new_size})
         self.session.commit()
         return new_size
 
 
-    def update_checksum(self, file):
-        checksum = self.hash(file.source_path)
-        self.session.query(Files).where(Files.source_path == file.source_path).\
+    def _update_checksum(self, file):
+        checksum = self._hash(file.source)
+        self.session.query(Files).where(Files.source == file.source).\
             update({'checksum' : checksum})
         self.session.commit()
         return checksum
@@ -202,128 +199,162 @@ class Waterlock():
 
     def start(self, job, same_system=False):
         source_free, _, _ = self.free_space(job)
-        hostname, destination_directory = self.session.query(\
-            Jobs.hostname, Jobs.destination_directory)\
-            .where(Jobs.name == job).one()
+        hostname, destination_directory, reserved, days_to_prune = self.session.query(\
+                Jobs.hostname, Jobs.destination_directory,\
+                Jobs.reserved_space, Jobs.days_to_prune)\
+                .where(Jobs.name == job).one()
 
         if gethostname() != hostname or same_system is True:
             os.makedirs(destination_directory, exist_ok=True)
 
         if source_free:
-            self.refresh_source(job)
+            self._refresh_source(job)
 
         file_list = self.session.query(Files)\
-            .where(Files.job == job, Files.progress != "destination").all()
+            .where(Files.job == job, Files.progress != 2).all()
 
-        free_space = True
         for file in file_list:
-            if free_space is True:
-                free_space = self.copy_cargo(file)
+            _, mid_free, dst_free = self.free_space(job)
+            space_needed = reserved + file.size
+
+            if same_system is True:
+                os.makedirs(os.path.dirname(file.destination), exist_ok=True)
+
+            if file.progress == 0 and mid_free and mid_free > space_needed:
+                self._copy_cargo(file.source, file.middle, file.progress, file.checksum)
+
+            elif file.progress == 1 and dst_free and dst_free > space_needed:
+                if os.path.exists(file.destination):
+                    self._archive_version(file)
+                    self._prune_versions(file.job, days_to_prune)
+
+                self._copy_cargo(file.middle, file.destination, file.progress, file.checksum)
+
+            elif mid_free < space_needed or dst_free < space_needed:
+                logging.error("Not enough space on copy target! Ending...")
+                return False
+        return True
 
 
-    def create_db_version(self, file):
-        directory = self.sanitize(os.path.dirname(file.destination_path))
-        file_name = file.destination_path.split('/')[-1]
-        file_name = '_'.join([file_name, str(file.modtime_ms)])
+    def _copy_cargo(self, src, dst, progress, checksum):
+        logging.info('Copying %s', src)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        copy2(src, dst)
+        result_checksum = self._hash(dst)
+
+        if result_checksum == checksum:
+            self.session.query(Files).where(Files.source == src).\
+                update({'progress' : progress + 1})
+
+        else:
+            raise Exception(f'Checksums do not match for {src}')
+
+
+    def _create_db_version(self, file):
+        directory = self._sanitize(os.path.dirname(file.destination))
+        file_name = file.destination.split('/')[-1]
+        file_name = '_'.join([file_name, str(file.modtime)])
         file_name = '/'.join([directory, '.archive', file_name])
-        version = FileVersions( \
-                    version_path = file_name, \
-                    destination_path = file.destination_path,
-                    size = file.size,
-                    checksum = file.checksum,
-                    modtime_ms = file.modtime_ms,
-                    job = file.job,
-                    status = 'pending'
-                )
+        version = FileVersions(version = file_name, \
+                            destination = file.destination,\
+                            size = file.size,\
+                            checksum = file.checksum,\
+                            modtime = file.modtime,\
+                            job = file.job,\
+                            status = 'pending')
         self.session.add(version)
         self.session.query(FileVersions).where(\
-            FileVersions.status == 'pending',\
-            FileVersions.destination_path == file.destination_path,\
-            FileVersions.checksum != file.checksum
-            ).delete()
+                            FileVersions.status == 'pending',\
+                            FileVersions.destination == file.destination,\
+                            FileVersions.checksum != file.checksum).delete()
         self.session.commit()
         return True
 
 
-    def archive_version(self, file):
-        old_modtime = os.path.getmtime(file.destination_path)
-        version_path = self.session.query(FileVersions.version_path).where(\
-            FileVersions.destination_path == file.destination_path,
-            FileVersions.modtime_ms == old_modtime, \
-            FileVersions.status == 'pending'
-            ).one()[0]
-        logging.info('Versioning: %s', version_path)
-        os.makedirs(os.path.dirname(version_path), exist_ok=True)
-        move(file.destination_path, version_path)
-        self.session.query(FileVersions).where(FileVersions.version_path == version_path).\
+    def _archive_version(self, file):
+        old_modtime = os.path.getmtime(file.destination)
+        version = self.session.query(FileVersions.version).where( \
+                            FileVersions.destination == file.destination,\
+                            FileVersions.modtime == old_modtime,\
+                            FileVersions.status == 'pending'\
+                            ).one()[0]
+        logging.info('Versioning: %s', version)
+        os.makedirs(os.path.dirname(version), exist_ok=True)
+        move(file.destination, version)
+        self.session.query(FileVersions).where(FileVersions.version == version).\
             update({'status' : 'success'})
         self.session.commit()
         return True
 
 
-    def prune_versions(self, job, days):
+    def _prune_versions(self, job, days):
         seconds = days * 86400
         now = time()
         prune_threshold = now - seconds
         old_versions = self.session.query(FileVersions).where(\
-            FileVersions.modtime_ms < prune_threshold,\
-            FileVersions.job == job,\
-            FileVersions.status == 'success').all()
+                            FileVersions.modtime < prune_threshold,\
+                            FileVersions.job == job,\
+                            FileVersions.status == 'success').all()
 
         for version in old_versions:
-            logging.info('Pruning %s', version.version_path)
-            os.remove(version.version_path)
+            logging.info('Pruning %s', version.version)
+            os.remove(version.version)
             self.session.query(FileVersions).where(\
-                FileVersions.checksum == version.checksum).delete()
+                            FileVersions.checksum == version.checksum).delete()
             self.session.commit()
         return True
 
 
-    def copy_cargo(self, file):
-        _, mid_free, dst_free = self.free_space(file.job)
-        reserved, days_to_prune = self.session.query(Jobs.reserved_space, \
-            Jobs.days_to_prune).where(Jobs.name == file.job).one()
-        space_needed = reserved + file.size
+    def import_destination(self, job):
+        dst = self.session.query(Jobs.destination_directory)\
+                .where(Jobs.name == job).one()[0]
+        logging.info('Beginning analysis of destination: %s', dst)
 
-        if file.progress == 'source' and mid_free and mid_free > space_needed:
-            logging.info('Copying %s', file.source_path)
-            os.makedirs(os.path.dirname(file.middle_path), exist_ok=True)
-            copy2(file.source_path, file.middle_path)
-            result_checksum = self.hash(file.middle_path)
-            if result_checksum == file.checksum:
-                self.session.query(Files).where(Files.source_path == file.source_path).\
-                    update({'progress' : 'middle'})
-            else:
-                raise Exception(f'Checksums do not match for {file.source_path}')
-
-        elif file.progress == 'source' and mid_free and mid_free < space_needed:
-            logging.error("Out of space! Ending...")
-            return False
-
-        elif file.progress == 'middle' and dst_free and dst_free > space_needed:
-            logging.info('Copying %s', file.middle_path)
-            if os.path.exists(file.destination_path):
-                self.archive_version(file)
-                self.prune_versions(file.job, days_to_prune)
-            os.makedirs(os.path.dirname(file.destination_path), exist_ok=True)
-            copy2(file.middle_path, file.destination_path)
-            result_checksum = self.hash(file.destination_path)
-            if result_checksum == file.checksum:
-                self.session.query(Files).where(Files.source_path == file.source_path).\
-                    update({'progress' : 'destination'})
-            else:
-                raise Exception(f'Checksums do not match for {file.source_path}')
-
-        elif file.progress == 'middle' and dst_free and dst_free < space_needed:
-            logging.error("Out of space! Ending...")
-            return False
-        self.session.commit()
+        for folder, _, file_list in os.walk(dst):
+            folder = self._sanitize(folder)
+            for file in file_list:
+                destination = self._sanitize(file)
+                destination = '/'.join([folder, destination])
+                logging.info('Analyzing %s', destination)
+                checksum = self._hash(destination)
+                dest_time = os.path.getmtime(destination)
+                if self.session.query(exists().where(\
+                            Files.checksum == checksum)).scalar() is True:
+                    logging.info('Recognized file: %s', destination)
+                    self.session.query(Files).where(Files.destination == destination)\
+                            .update({'progress' : 2})
+                elif self.session.query(exists().where(\
+                            Files.destination == destination,
+                            Files.checksum != checksum,
+                            Files.modtime > dest_time)).scalar() is True:
+                    logging.info('Recognized older version of file: %s', destination)
+                    self.session.query(Files).where(Files.destination == destination)\
+                            .update({'progress' : 0, 'modtime' : dest_time})
+                if self.session.query(exists().where(\
+                            Files.destination == destination)).scalar() is False:
+                    logging.warning('Unrecognized file on destination: %s', destination)
         return True
 
 
     def change_destination(self, job, new_path):
         pass
 
+
+    def clear_cargo(self):
+        pass
+
+
+    def verify_destination(self):
+        pass
+
+
+    def restore(self, job):
+        #provide list of restore points for user to select from
+        pass
+
+
+    def reset(self):
+        pass
 
 '''Features
     - Remove on destination
