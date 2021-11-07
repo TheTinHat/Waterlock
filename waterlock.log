@@ -1,0 +1,7 @@
+root - INFO - 2021-11-06 18:17:54,928 - Edited job_0 - {'days_to_prune': 0.00069}
+root - INFO - 2021-11-06 18:17:54,945 - Edited job_1 - {'days_to_prune': 0.00069}
+root - INFO - 2021-11-06 18:17:54,961 - Edited All Jobs: {'days_to_prune': 0.0013}
+root - INFO - 2021-11-06 18:17:54,980 - Initialized job_0
+root - INFO - 2021-11-06 18:17:54,984 - Initialized job_1
+root - INFO - 2021-11-06 18:17:54,985 - Scanning for new files for job_0
+root - INFO - 2021-11-06 18:17:54,987 - Scanning for new files for job_1
