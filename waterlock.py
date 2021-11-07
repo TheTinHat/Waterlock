@@ -1,11 +1,12 @@
-from tools import sanitize, hash, ms_modtime
 from shutil import copy2, disk_usage, move
 from sqlalchemy import Column, Integer, String, create_engine, exists, or_
 from sqlalchemy.ext.declarative import declarative_base 
 from sqlalchemy.orm import sessionmaker, Session, Query
 from db_classes import Files, Jobs, FileVersions
 import os
+import logging
 from socket import gethostname
+from hashlib import blake2b
 from time import time
 
 
@@ -17,6 +18,10 @@ class Waterlock():
         self.session = self.Session()
         self.Base = declarative_base()
         Jobs.metadata.create_all(self.engine)
+        logging.basicConfig(filename='waterlock.log', \
+                            filemode='w', \
+                            level=logging.INFO, \
+                            format='%(name)s - %(levelname)s - %(asctime)s - %(message)s')
     
     @property
     def job_count(self):
@@ -35,9 +40,10 @@ class Waterlock():
         session = self.session
         assert os.path.isabs(source_directory), "Error, source directory path is not absolute"
         assert os.path.isabs(destination_directory), "Error, destination directory path is not absolute"
-        source_directory = sanitize(source_directory)
-        destination_directory = sanitize(destination_directory)
-        middle_directory = sanitize(middle_directory)
+        
+        source_directory = self.sanitize(source_directory)
+        destination_directory = self.sanitize(destination_directory)
+        middle_directory = self.sanitize(middle_directory)
         destination_directory = '/'.join([destination_directory, str(job_name)])
         middle_directory = '/'.join([middle_directory, str(job_name)])
         os.makedirs(middle_directory, exist_ok=True)
@@ -57,6 +63,7 @@ class Waterlock():
             session.add(config)
             session.commit()
 
+        logging.info(f'Initialized {job_name}')
         return True
 
 
@@ -64,12 +71,14 @@ class Waterlock():
         for key, value in kwargs.items():
             self.session.query(Jobs).where(Jobs.name == job).\
                 update({str(key) : value})
+        logging.info(f'Edited {job} - {kwargs}')
         self.session.commit()        
 
     def edit_all_jobs(self, **kwargs):
         for key, value in kwargs.items():
             self.session.query(Jobs).\
                 update({str(key) : value})
+        logging.info(f'Edited All Jobs: {kwargs}')
         self.session.commit()   
 
     def free_space(self, job):
@@ -91,8 +100,24 @@ class Waterlock():
         
         return source_free, middle_free, destination_free
                 
+    def sanitize(self, file):
+        file = file.replace("\\","/").split('/')
+        file = [x for x in file if x != '']
+        file = '/'.join(file)
+        return file
+
+    def hash(self, file):
+        hash = blake2b() 
+        with open(file, 'rb') as f:
+            fb = f.read(32768) 
+            while len(fb) > 0:
+                hash.update(fb) 
+                fb = f.read(32768) 
+        return str(hash.hexdigest())
+
 
     def add_new_files(self, job):
+        logging.info(f'Scanning for new files for {job}')
         src, mid, dst = self.session.query(\
             Jobs.source_directory, \
             Jobs.middle_directory, \
@@ -100,9 +125,9 @@ class Waterlock():
             .where(Jobs.name == job).one()
 
         for folder, _, file_list in os.walk(src):
-            folder = sanitize(folder)
+            folder = self.sanitize(folder)
             for file in file_list:
-                source_path = sanitize(file)
+                source_path = self.sanitize(file)
                 source_path = '/'.join([folder, source_path])
                 middle_path = source_path.replace(src, mid)
                 dest_path = source_path.replace(src, dst)
@@ -115,21 +140,22 @@ class Waterlock():
                         destination_path = dest_path,
                         progress = "source",
                         size = os.path.getsize(source_path),
-                        last_modtime_ms = ms_modtime(source_path),
+                        modtime_ms = os.path.getmtime(source_path),
                         job = job)
                     self.session.add(new_file)
                     self.session.commit()
         return True
     
     def refresh_source(self, job):
+        logging.info(f'Scanning for file changes for {job}')
         self.add_new_files(job)
         file_list = self.session.query(Files)\
             .where(Files.job == job).all()
         for file in file_list:
             if os.path.exists(file.source_path):
-                if ms_modtime(file.source_path) != file.last_modtime_ms or \
+                if os.path.getmtime(file.source_path) != file.modtime_ms or \
                         os.path.getsize(file.source_path) != file.size:
-                    print(f'Updating {file.source_path}')
+                    logging.info(f'Updating {file.source_path}')
                     self.create_db_version(file)
                     self.update_modtime(file)
                     self.update_size(file)
@@ -139,9 +165,9 @@ class Waterlock():
 
 
     def update_modtime(self, file):
-        mod_time = ms_modtime(file.source_path)
+        mod_time = os.path.getmtime(file.source_path)
         self.session.query(Files).where(Files.source_path == file.source_path).\
-            update({'last_modtime_ms' : mod_time,
+            update({'modtime_ms' : mod_time,
                     'progress' : 'source'})
         self.session.commit()
         return mod_time
@@ -156,14 +182,12 @@ class Waterlock():
 
 
     def update_checksum(self, file):
-        checksum = hash(file.source_path)
+        checksum = self.hash(file.source_path)
         self.session.query(Files).where(Files.source_path == file.source_path).\
             update({'checksum' : checksum})
         self.session.commit()
         return checksum
 
-
-    # I NEED TO CREATE DIRECTORY ON DESTINATION SYSTEM ONLY IF HOSTNAME != HOSTNAME ON SOURCE
 
     def start(self, job, same_system=False):
         source_free, _, destination_free = self.free_space(job)
@@ -187,16 +211,16 @@ class Waterlock():
 
 
     def create_db_version(self, file):
-        directory = sanitize(os.path.dirname(file.destination_path))
+        directory = self.sanitize(os.path.dirname(file.destination_path))
         file_name = file.destination_path.split('/')[-1]
-        file_name = '_'.join([file_name, str(file.last_modtime_ms)])
+        file_name = '_'.join([file_name, str(file.modtime_ms)])
         file_name = '/'.join([directory, '.archive', file_name])
         version = FileVersions( \
                     version_path = file_name, \
                     destination_path = file.destination_path,
                     size = file.size,
                     checksum = file.checksum,
-                    last_modtime_ms = file.last_modtime_ms,
+                    modtime_ms = file.modtime_ms,
                     job = file.job,
                     status = 'pending'
                 )
@@ -211,13 +235,13 @@ class Waterlock():
 
 
     def archive_version(self, file):
-        old_modtime = ms_modtime(file.destination_path)
+        old_modtime = os.path.getmtime(file.destination_path)
         version_path = self.session.query(FileVersions.version_path).where(\
             FileVersions.destination_path == file.destination_path,
-            FileVersions.last_modtime_ms == old_modtime, \
+            FileVersions.modtime_ms == old_modtime, \
             FileVersions.status == 'pending'
             ).one()[0]
-        print(f'Versioning: {version_path}')
+        logging.info(f'Versioning: {version_path}')
         os.makedirs(os.path.dirname(version_path), exist_ok=True)
         move(file.destination_path, version_path)
         self.session.query(FileVersions).where(FileVersions.version_path == version_path).\
@@ -227,16 +251,16 @@ class Waterlock():
 
 
     def prune_versions(self, job, days):
-        miliseconds = days * 86400 * 1000
-        now = time() * 1000
-        prune_threshold = now - miliseconds
+        seconds = days * 86400
+        now = time()
+        prune_threshold = now - seconds
         old_versions = self.session.query(FileVersions).where(\
-            FileVersions.last_modtime_ms < prune_threshold,\
+            FileVersions.modtime_ms < prune_threshold,\
             FileVersions.job == job,\
             FileVersions.status == 'success').all()
         
         for version in old_versions:
-            print(f'Pruning {version.version_path}')
+            logging.info(f'Pruning {version.version_path}')
             os.remove(version.version_path)
             self.session.query(FileVersions).where(\
                 FileVersions.checksum == version.checksum).delete()
@@ -251,10 +275,10 @@ class Waterlock():
         space_needed = reserved + file.size
 
         if file.progress == 'source' and mid_free and mid_free > space_needed:
-            print(f'Copying {file.source_path}')
+            logging.info(f'Copying {file.source_path}')
             os.makedirs(os.path.dirname(file.middle_path), exist_ok=True)
             copy2(file.source_path, file.middle_path)
-            result_checksum = hash(file.middle_path)
+            result_checksum = self.hash(file.middle_path)
             if result_checksum == file.checksum:
                 self.session.query(Files).where(Files.source_path == file.source_path).\
                     update({'progress' : 'middle'})
@@ -262,17 +286,17 @@ class Waterlock():
                 raise Exception(f'Checksums do not match for {file.source_path}')
     
         elif file.progress == 'source' and mid_free and mid_free < space_needed:
-            print("Out of space! Skipping...")
+            logging.error("Out of space! Ending...")
             return False            
 
         elif file.progress == 'middle' and dst_free and dst_free > space_needed:
-            print(f'Copying {file.middle_path}')
+            logging.info(f'Copying {file.middle_path}')
             if os.path.exists(file.destination_path):
                 self.archive_version(file)
                 self.prune_versions(file.job, days_to_prune)
             os.makedirs(os.path.dirname(file.destination_path), exist_ok=True)
             copy2(file.middle_path, file.destination_path)
-            result_checksum = hash(file.destination_path)
+            result_checksum = self.hash(file.destination_path)
             if result_checksum == file.checksum:
                 self.session.query(Files).where(Files.source_path == file.source_path).\
                     update({'progress' : 'destination'})
@@ -280,7 +304,7 @@ class Waterlock():
                 raise Exception(f'Checksums do not match for {file.source_path}')
         
         elif file.progress == 'middle' and dst_free and dst_free < space_needed:
-            print("Out of space! Skipping...")
+            logging.error("Out of space! Ending...")
             return False
         self.session.commit()
         return True
@@ -291,7 +315,6 @@ class Waterlock():
 
 
 '''Features
-    -File encryption
     - Remove on destination
     - Clear Cargo
     - Full Hash Verification
@@ -315,7 +338,7 @@ class Waterlock():
 ## BELOW IS HOW QUERIES WORK
 '''q = session.query(Jobs).where(Jobs.source_directory==source_directory).all()
 for x in q:
-    print(x.source_directory)'''
+    logging.info(x.source_directory)'''
 
 
 

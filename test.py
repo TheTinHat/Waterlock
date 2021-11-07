@@ -26,6 +26,7 @@ def make_paths():
     current_dir = str(os.path.dirname(os.path.realpath(__file__)))
     source_directory = current_dir + '/test/src/'
     destination_directory = current_dir + '/test/dst/'
+    #destination_directory = '/home/david/pythontest'
     return source_directory, destination_directory
 
 def batch_init(src, dst):
@@ -47,16 +48,16 @@ def batch_add_new(jobs):
         wl.add_new_files(job)
         
 
-#reset_db()
-#clear_dataset()
-#create_dataset(3)
+reset_db()
+clear_dataset()
+create_dataset(3)
 #os.makedirs('test/dst/job_1')
 
 src, dst = make_paths()
 
 wl = Waterlock()
-#wl.edit_job('job_0', days_to_prune=0.00069)
-#wl.edit_job('job_1', days_to_prune=0.00069)
+wl.edit_job('job_0', days_to_prune=0.00069)
+wl.edit_job('job_1', days_to_prune=0.00069)
 wl.edit_all_jobs(days_to_prune=0.0013)
 
 jobs = batch_init(src,dst)
@@ -65,5 +66,5 @@ batch_add_new(jobs)
 wl.start('job_0')
 wl.start('job_1')
 #print("TRYING AGAIN")
-#wl.start('job_0', same_system=True)
-#wl.start('job_1', same_system=True)
+wl.start('job_0', same_system=True)
+wl.start('job_1', same_system=True)

@@ -13,7 +13,7 @@ class Files(Base):
     destination_path = Column(String)
     size = Column(Integer)
     checksum = Column(String)
-    last_modtime_ms = Column(Integer) #Must use milisecond time as integer!
+    modtime_ms = Column(REAL)
     progress = Column(String)
     job = Column(String, ForeignKey('jobs.name'))
 
@@ -23,7 +23,7 @@ class FileVersions(Base):
     destination_path = Column(String, ForeignKey('files.destination_path'))
     size = Column(Integer)
     checksum = Column(String)
-    last_modtime_ms = Column(Integer) #Must use milisecond time as integer!
+    modtime_ms = Column(REAL) 
     job = Column(String, ForeignKey('jobs.name'))
     status = Column(String)
 

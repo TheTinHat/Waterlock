@@ -3,3 +3,5 @@ cargo/*
 __pycache__
 config.db
 
+waterlock.log
+*.log
