@@ -10,8 +10,6 @@ from db_classes import Files, Jobs
 from file import File
 
 
-Base = declarative_base()
-
 logging.basicConfig(filename='waterlock.log', \
                     filemode='w', \
                     level=logging.INFO, \
