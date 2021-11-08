@@ -13,9 +13,11 @@ def create_dataset(n):
 
 
 def clear_dataset():
-    rmtree('test/')
-    rmtree('cargo')
-
+    try:
+        rmtree('test/')
+        rmtree('cargo/')
+    except:
+        pass
 
 
 def reset_db():
@@ -37,34 +39,25 @@ def batch_init(src, dst):
         jobs.append(name)
         src_i = src + 'test_' + str(i)
         wl.initialize(job_name=name, \
-            source_directory=src_i, \
-            destination_directory=dst,
-            days_to_prune = 0.00347)
+            src_dir =src_i, \
+            dst_dir =dst,
+            prune_age = 0.02)
     return jobs
 
-def batch_add_new(jobs):
-    global wl
-    for job in jobs:
-        wl._add_new_files(job)
-
-
-#reset_db()
-#clear_dataset()
-create_dataset(3)
+# reset_db()
+# clear_dataset()
+#create_dataset(3)
 #os.makedirs('test/dst/job_1')
 
 src, dst = make_paths()
 
 wl = Waterlock()
-wl.edit_job('job_0', days_to_prune=0.00069)
-wl.edit_job('job_1', days_to_prune=0.00069)
-wl.edit_all_jobs(days_to_prune=0.0013)
 
 jobs = batch_init(src,dst)
-batch_add_new(jobs)
 
-wl.start('job_0')
-wl.start('job_1')
-#print("TRYING AGAIN")
-wl.start('job_0', same_system=True)
-wl.start('job_1', same_system=True)
+
+wl.start_job('job_0', same_system=True)
+# wl.start_job('job_1', same_system=True)
+# print("Starting jobs again")
+wl.start_job('job_0', same_system=True)
+# wl.start_job('job_1', same_system=True)
