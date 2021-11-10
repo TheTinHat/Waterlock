@@ -61,6 +61,7 @@ class Waterlock():
         logging.info('Initialized %s', job_name)
         return True
 
+
     @property
     def job_count(self):
         return self.session.query(Jobs).count()
@@ -80,6 +81,7 @@ class Waterlock():
         logging.info('Edited all jobs - %s', kwargs)
         self.session.commit()
 
+
     def make_file(self, rel_path, job):
         file = File(Session=self.Session,
                 rel_path=rel_path,
@@ -90,8 +92,10 @@ class Waterlock():
                 reserved=job.reserved)
         return file
 
+
     def get_job(self, name):
         return self.session.query(Jobs).where(Jobs.name == name).one()
+
 
     def get_file_list(self, job_name, exclude_moved=False):
         if exclude_moved == False:
@@ -99,6 +103,7 @@ class Waterlock():
         elif exclude_moved == True:
             return self.session.query(Files).where(\
                     Files.job == job_name, Files.progress < 2).all()
+
 
     def scan_src(self, job):
         job = self.get_job(job)
@@ -132,6 +137,7 @@ class Waterlock():
             file.prune_versions(job.prune_age)
         return True
 
+
     def start_job(self, name: str, same_system=False):
         job = self.get_job(name)
 
@@ -156,13 +162,13 @@ class Waterlock():
         self.prune(job)
 
 
-
-
     def verify_destination(self):
         pass
 
+
     def restore(self):
         pass
+
 
     def import_destination(self):
         pass

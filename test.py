@@ -24,12 +24,14 @@ def reset_db():
     if os.path.exists('config.db'):
         os.remove('config.db')
 
+
 def make_paths():
     current_dir = str(os.path.dirname(os.path.realpath(__file__)))
     source_directory = current_dir + '/test/src/'
     destination_directory = current_dir + '/test/dst/'
     #destination_directory = '/home/david/pythontest'
     return source_directory, destination_directory
+
 
 def batch_init(src, dst):
     global wl
@@ -43,6 +45,7 @@ def batch_init(src, dst):
             dst_dir =dst,
             prune_age = 0.02)
     return jobs
+
 
 # reset_db()
 # clear_dataset()

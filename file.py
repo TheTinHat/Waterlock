@@ -3,7 +3,6 @@ import logging
 from shutil import copy2, disk_usage, move
 from time import time
 
-
 from tools import *
 from sqlalchemy import exists, and_
 from db_classes import Files, Versions
@@ -35,19 +34,23 @@ class File():
     def src_path(self):
         return self.src_dir.joinpath(self.rel_path)
 
+
     @property
     def mid_path(self):
         return self.mid_dir.joinpath(self.job, self.rel_path)
 
+
     @property
     def dst_path(self):
         return self.dst_dir.joinpath(self.job, self.rel_path)
+
 
     @property
     def progress(self):
         '''Progress: 0 = source, 1 = middle, 2 = destination'''
         return self.session.query(Files.progress).where( \
                 Files.rel_path == self.rel_path, Files.job == self.job).one()[0]
+
 
     @property
     def checksum(self):
@@ -60,6 +63,7 @@ class File():
             except:
                 self._checksum_val = hash_this(self.src_path)
             return self._checksum_val
+
 
     @property
     def size(self):
@@ -86,6 +90,7 @@ class File():
                 self._modtime_val = self.src_path.stat().st_mtime
             return self._modtime_val
 
+
     @property
     def free_space(self):
         '''Check if there's enough space to write file to next lock'''
@@ -102,6 +107,7 @@ class File():
         else:
             return False
 
+
     def update_attrs(self):
         self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
                 .update({'checksum': hash_this(self.src_path),
@@ -109,10 +115,12 @@ class File():
                         'modtime' : self.src_path.stat().st_mtime})
         self.session.commit()
 
+
     def mark_for_removal(self):
         self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
                 .update({'progress': -1})
         self.session().commit()
+
 
     def increment_progress(self):
         logging.debug('Incrementing Progress on %s', self.rel_path)
@@ -121,12 +129,14 @@ class File():
         self.session.commit()
         return self.progress
 
+
     def reset_progress(self):
         self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
                 .update({'progress': 0})
         logging.info('Resetting progress on %s', self.rel_path)
         self.session.commit()
         return self.progress
+
 
     def insert_db(self):
         '''Add new file to the database'''
@@ -139,6 +149,7 @@ class File():
             job = self.job)
         self.session.add(new_file)
         self.session.commit()
+
 
     def verify_move(self):
         '''Hash destination file, update progress if hash matches source, otherwise

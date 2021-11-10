@@ -23,7 +23,6 @@ class Versions(Base):
     modtime = Column(REAL)
 
 
-
 class Jobs(Base):
     __tablename__ = 'jobs'
     name = Column(String, primary_key=True)
