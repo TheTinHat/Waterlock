@@ -97,12 +97,15 @@ class Waterlock():
         return self.session.query(Jobs).where(Jobs.name == name).one()
 
 
-    def get_file_list(self, job_name, exclude_moved=False):
+    def get_file_list(self, job:str, exclude_moved=False, only_moved=False):
         if exclude_moved == False:
-            return self.session.query(Files).where(Files.job == job_name).all()
+            return self.session.query(Files).where(Files.job == job).all()
         elif exclude_moved == True:
             return self.session.query(Files).where(\
-                    Files.job == job_name, Files.progress < 2).all()
+                    Files.job == job, Files.progress < 2).all()
+        elif only_moved == True:
+            return self.session.query(Files).where(\
+                    Files.job == job, Files.progress == 2).all()
 
 
     def scan_src(self, job:str):
@@ -180,11 +183,21 @@ class Waterlock():
         return True
 
 
-    def import_destination(self, job):
+    def import_destination(self, job:str):
         job = self.get_job(job)
         src_files = self.scan_src(job.name)
         for file in src_files:
             file.merge_destination()
+        return True
+
+
+    def verify_destination(self, job:str):
+        job = self.get_job(job)
+        file_list = self.get_file_list(job.name, only_moved=True)
+        for file in file_list:
+            hash_match = file.verify_dst()
+            if hash_match == False:
+                logging.info('File hash does not match destination: %s', file.rel_path)
         return True
 
 
