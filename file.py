@@ -1,10 +1,11 @@
 from pathlib import Path
 import logging
 from shutil import copy2, disk_usage, move
+from sqlalchemy import exists, and_
 from time import time
+from functools import cached_property
 
 from tools import *
-from sqlalchemy import exists, and_
 from db_classes import Files, Versions
 
 
@@ -30,65 +31,54 @@ class File():
             self.insert_db()
 
 
-    @property
+    @cached_property
     def src_path(self):
         return self.src_dir.joinpath(self.rel_path)
 
 
-    @property
+    @cached_property
     def mid_path(self):
         return self.mid_dir.joinpath(self.job, self.rel_path)
 
 
-    @property
+    @cached_property
     def dst_path(self):
         return self.dst_dir.joinpath(self.job, self.rel_path)
 
 
-    @property
+    @cached_property
     def progress(self):
         '''Progress: 0 = source, 1 = middle, 2 = destination'''
         return self.session.query(Files.progress).where( \
                 Files.rel_path == self.rel_path, Files.job == self.job).one()[0]
 
 
-    @property
+    @cached_property
     def checksum(self):
-        if self._checksum_val:
-            return self._checksum_val
-        elif not self._checksum_val:
-            try:
-                self._checksum_val = self.session.query(Files.checksum).where(\
-                        Files.rel_path == self.rel_path, Files.job == self.job).one()[0]
-            except:
-                self._checksum_val = hash_this(self.src_path)
-            return self._checksum_val
+        try:
+           return self.session.query(Files.checksum).where(\
+                    Files.rel_path == self.rel_path, Files.job == self.job).one()[0]
+        except:
+            return hash_this(self.src_path)
 
 
-    @property
+
+    @cached_property
     def size(self):
-        if self._size_val:
-            return self._size_val
-        elif not self._size_val:
-            try:
-                self._size_val = self.session.query(Files.size).where(\
-                        Files.rel_path == self.rel_path, Files.job == self.job).one()[0]
-            except:
-                self._size_val = self.src_path.stat().st_size
-            return self._size_val
+        try:
+            return self.session.query(Files.size).where(\
+                    Files.rel_path == self.rel_path, Files.job == self.job).one()[0]
+        except:
+            return self.src_path.stat().st_size
 
 
-    @property
+    @cached_property
     def modtime(self):
-        if self._modtime_val:
-            return self._modtime_val
-        elif not self._modtime_val:
-            try:
-                self._modtime_val = self.session.query(Files.modtime).where(\
-                        Files.rel_path == self.rel_path, Files.job == self.job).one()[0]
-            except:
-                self._modtime_val = self.src_path.stat().st_mtime
-            return self._modtime_val
+        try:
+            return self.session.query(Files.modtime).where(\
+                    Files.rel_path == self.rel_path, Files.job == self.job).one()[0]
+        except:
+            return self.src_path.stat().st_mtime
 
 
     @property

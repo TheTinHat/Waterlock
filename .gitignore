@@ -5,3 +5,4 @@ config.db
 
 waterlock.log
 *.log
+waterlock.code-workspace
