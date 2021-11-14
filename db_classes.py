@@ -14,6 +14,13 @@ class Files(Base):
     progress = Column(Integer)
 
 
+class DstFiles(Base):
+    __tablename__ = 'dst_files'
+    rel_path = Column(String, primary_key=True)
+    job = Column(String, ForeignKey('jobs.name'), primary_key=True)
+    checksum = Column(String)
+
+
 class Versions(Base):
     __tablename__ = 'fileversions'
     version_path = Column(String, unique=True, primary_key=True)

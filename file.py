@@ -6,7 +6,7 @@ from time import time
 from functools import cached_property
 
 from tools import *
-from db_classes import Files, Versions
+from db_classes import Files, Versions, DstFiles
 
 
 class File():
@@ -20,10 +20,6 @@ class File():
         self.dst_dir = Path(dst_dir)
         self.job = job
         self.reserved = reserved
-        self.attempts = 0
-        self._checksum_val = ''
-        self._size_val = ''
-        self._modtime_val = ''
 
         if self.session.query(exists().where(and_(\
                     Files.rel_path == self.rel_path, Files.job == self.job)))\
@@ -46,14 +42,14 @@ class File():
         return self.dst_dir.joinpath(self.job, self.rel_path)
 
 
-    @cached_property
+    @property
     def progress(self):
         '''Progress: 0 = source, 1 = middle, 2 = destination'''
         return self.session.query(Files.progress).where( \
                 Files.rel_path == self.rel_path, Files.job == self.job).one()[0]
 
 
-    @cached_property
+    @property
     def checksum(self):
         try:
            return self.session.query(Files.checksum).where(\
@@ -62,8 +58,7 @@ class File():
             return hash_this(self.src_path)
 
 
-
-    @cached_property
+    @property
     def size(self):
         try:
             return self.session.query(Files.size).where(\
@@ -72,7 +67,7 @@ class File():
             return self.src_path.stat().st_size
 
 
-    @cached_property
+    @property
     def modtime(self):
         try:
             return self.session.query(Files.modtime).where(\
@@ -98,36 +93,6 @@ class File():
             return False
 
 
-    def update_attrs(self):
-        self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
-                .update({'checksum': hash_this(self.src_path),
-                        'size' : self.src_path.stat().st_size,
-                        'modtime' : self.src_path.stat().st_mtime})
-        self.session.commit()
-
-
-    def mark_for_removal(self):
-        self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
-                .update({'progress': -1})
-        self.session().commit()
-
-
-    def increment_progress(self):
-        logging.debug('Incrementing Progress on %s', self.rel_path)
-        self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
-                .update({'progress': self.progress + 1})
-        self.session.commit()
-        return self.progress
-
-
-    def reset_progress(self):
-        self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
-                .update({'progress': 0})
-        logging.info('Resetting progress on %s', self.rel_path)
-        self.session.commit()
-        return self.progress
-
-
     def insert_db(self):
         '''Add new file to the database'''
         new_file = Files( \
@@ -139,6 +104,38 @@ class File():
             job = self.job)
         self.session.add(new_file)
         self.session.commit()
+        return True
+
+
+    def update_attrs(self):
+        self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
+                .update({'checksum': hash_this(self.src_path),
+                        'size' : self.src_path.stat().st_size,
+                        'modtime' : self.src_path.stat().st_mtime})
+        self.session.commit()
+        return True
+
+
+    def mark_for_removal(self):
+        self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
+                .update({'progress': -1})
+        self.session().commit()
+        return True
+
+
+    def set_progress(self, progress:int):
+        self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
+                .update({'progress': progress})
+        self.session.commit()
+        return self.progress
+
+
+    def increment_progress(self):
+        logging.debug('Incrementing Progress on %s', self.rel_path)
+        self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job)\
+                .update({'progress': self.progress + 1})
+        self.session.commit()
+        return self.progress
 
 
     def verify_move(self):
@@ -151,7 +148,7 @@ class File():
         else:
             logging.warning('Hashes do not match. \
                     Resetting progress and deleting %s', self.dst_path)
-            self.reset_progress()
+            self.set_progress(0)
             self.dst_path.unlink()
             return False
 
@@ -170,7 +167,8 @@ class File():
         if self.progress == 1:
             if self.mid_path.exists() == False:
                 logging.debug('File missing from middle. Resetting progress on %s', self.rel_path)
-                self.reset_progress()
+                self.set_progress(0)
+        return True
 
 
     def archive_version(self):
@@ -213,18 +211,20 @@ class File():
             if Path(version).exists() == False:
                 self.session.query(Versions).where(Versions.version_path == version).delete()
                 self.session.commit()
+        return True
 
 
-    def sync_deletions(self, delete=False):
+    def sync_deletions(self, delete_now=False):
         '''Archive destination file if deleted on source,
         or delete entirely if delete flag is True'''
-        if self.progress == -1 and delete is False:
+        if self.progress == -1 and delete_now is False:
             self.archive_version()
-        elif self.progress == -1 and delete is True:
+        elif self.progress == -1 and delete_now is True:
             logging.info('Deleting %s', self.dst_path)
             self.dst_path.unlink()
             self.session.query(Files).where(Files.rel_path == self.rel_path, Files.job == self.job).delete()
             self.session.commit()
+        return True
 
 
     def check_exists(self):
@@ -266,4 +266,22 @@ class File():
                 self.verify_move()
                 return True
         else:
-            pass
+            return False
+
+
+    def merge_destination(self):
+        '''Check if file is in dst_files db,
+        and if so update progress to 2 then delete from db'''
+        if self.session.query(exists().where(and_(\
+                    DstFiles.rel_path == self.rel_path,
+                    DstFiles.checksum == self.checksum,
+                    DstFiles.job == self.job)))\
+                    .scalar() is True:
+            self.set_progress(2)
+            self.session.query(DstFiles).where(
+                    DstFiles.rel_path == self.rel_path,
+                    DstFiles.checksum == self.checksum,
+                    DstFiles.job == self.job).delete()
+            return True
+        else:
+            return False
