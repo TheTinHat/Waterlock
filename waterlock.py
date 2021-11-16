@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from tools import *
-from db_classes import DstFiles, Files, Jobs
+from db_classes import DstFiles, Files, Jobs, Versions
 from file import File
 
 
@@ -65,6 +65,17 @@ class Waterlock():
     @property
     def job_count(self):
         return self.session.query(Jobs).count()
+
+
+    @property
+    def file_count(self):
+        return self.session.query(Files).count()
+
+
+    @property
+    def version_count(self):
+        return self.session.query(Versions).count()
+
 
     def edit_job(self, job, **kwargs):
         for key, value in kwargs.items():
